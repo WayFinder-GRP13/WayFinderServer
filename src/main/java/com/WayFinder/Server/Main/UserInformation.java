@@ -1,9 +1,9 @@
 package com.WayFinder.Server.Main;
 
-public class BucketList {
+public class UserInformation {
     private long id;
     private String name;
-    BucketList(long id, String name){
+    UserInformation(long id, String name){
         this.id = id;
         this.name = name;
     }
