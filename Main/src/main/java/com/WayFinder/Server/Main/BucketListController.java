@@ -11,7 +11,7 @@ public class BucketListController {
     private List<BucketList> myBucketList = new ArrayList();
     private final AtomicLong counter = new AtomicLong();
     public BucketListController(){
-        myBucketList.add(new BucketList(counter.incrementAndGet(), "Visit Colosseum in Rome"));
+        myBucketList.add(new BucketList(counter.incrementAndGet(), "Visit Coloseum in Rome"));
     }
     @GetMapping(value = "/")
     public ResponseEntity index() {
