@@ -1,14 +1,16 @@
 package com.WayFinder.Server.Main;
 
+import com.WayFinder.Server.Main.UserSettings.UserSettings;
 import com.google.maps.model.LatLng;
 
-public class RestAPIInformation {
-    private long id;
+public class RestAPIRequestInformation {
+    private int id;
     private String name;
     private LatLng startLocation;
     private LatLng endLocation;
+    private UserSettings settings;
 
-    RestAPIInformation(long id, String name, String startLocationLat,String startLocationLong,String endLocationLat,String endLocationLong){
+    RestAPIRequestInformation(int id, String name, String startLocationLat,String startLocationLong,String endLocationLat,String endLocationLong,UserSettings settings){
         this.id = id;
         this.name = name;
         double startLocationLatD = Double.parseDouble(startLocationLat);
@@ -17,11 +19,12 @@ public class RestAPIInformation {
         double endLocationLongD = Double.parseDouble(endLocationLong);
         this.startLocation = new LatLng(startLocationLatD,startLocationLongD);
         this.endLocation = new LatLng(endLocationLatD,endLocationLongD);
+        this.settings = settings;
     }
-    public long getId() {
+    public int getId() {
         return id;
     }
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
     public String getName() {
@@ -45,5 +48,13 @@ public class RestAPIInformation {
 
     public void setEndLocation(LatLng endLocation) {
         this.endLocation = endLocation;
+    }
+
+    public UserSettings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(UserSettings settings) {
+        this.settings = settings;
     }
 }

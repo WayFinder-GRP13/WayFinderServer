@@ -1,6 +1,5 @@
 package com.WayFinder.Server.Main;
 
-import com.google.maps.model.LatLng;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
@@ -9,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 public class RestAPIController {
-    private List<RestAPIInformation> myRestAPIInformation = new ArrayList();
+    private List<RestAPIRequestInformation> myRestAPIRequestInformation = new ArrayList();
     private final AtomicLong counter = new AtomicLong();
 
     public RestAPIController(){
@@ -20,9 +19,9 @@ public class RestAPIController {
     //Read
     @GetMapping(value = "/")
     public ResponseEntity index(@RequestParam(value="name") String name) {
-        RestAPIInformation itemToReturn = null;
+        RestAPIRequestInformation itemToReturn = null;
         System.out.println(name);
-        for (RestAPIInformation object : myRestAPIInformation){
+        for (RestAPIRequestInformation object : myRestAPIRequestInformation){
             System.out.println(object.getName());
             if(object.getName().contains(name)){
                 itemToReturn = object;
@@ -31,9 +30,9 @@ public class RestAPIController {
         return ResponseEntity.ok(itemToReturn);
     }
     @GetMapping(value = "/bucket")
-    public ResponseEntity getUser(@RequestParam(value="id") Long id) {
-        RestAPIInformation itemToReturn = null;
-        for(RestAPIInformation user : myRestAPIInformation){
+    public ResponseEntity getUser(@RequestParam(value="id") int id) {
+        RestAPIRequestInformation itemToReturn = null;
+        for(RestAPIRequestInformation user : myRestAPIRequestInformation){
             if(user.getId() == id)
                 itemToReturn = user;
         }
@@ -41,32 +40,32 @@ public class RestAPIController {
     }
 
     @PostMapping(value = "/")
-    public ResponseEntity addToUserList(@RequestBody RestAPIInformation request) {
+    public ResponseEntity addToUserList(@RequestBody RestAPIRequestInformation request) {
         if(request!=null){
             System.out.println("Success");
-            myRestAPIInformation.add(request);
+            myRestAPIRequestInformation.add(request);
         }
 
-        return ResponseEntity.ok(myRestAPIInformation);
+        return ResponseEntity.ok(myRestAPIRequestInformation);
     }
     //Update/Replace
     @PutMapping(value = "/")
     public ResponseEntity updateUserList(@RequestParam(value="name") String name, @RequestParam(value="id") Long id) {
-        myRestAPIInformation.forEach(RestAPIInformation ->  {
-            if(RestAPIInformation.getId() == id){
-                RestAPIInformation.setName(name);
+        myRestAPIRequestInformation.forEach(RestAPIRequestInformation ->  {
+            if(RestAPIRequestInformation.getId() == id){
+                RestAPIRequestInformation.setName(name);
             }
         });
-        return ResponseEntity.ok(myRestAPIInformation);
+        return ResponseEntity.ok(myRestAPIRequestInformation);
     }
     @DeleteMapping(value = "/")
     public ResponseEntity removeUserList(@RequestParam(value="id") Long id) {
-        RestAPIInformation itemToRemove = null;
-        for(RestAPIInformation user : myRestAPIInformation){
+        RestAPIRequestInformation itemToRemove = null;
+        for(RestAPIRequestInformation user : myRestAPIRequestInformation){
             if(user.getId() == id)
                 itemToRemove = user;
         }
-        myRestAPIInformation.remove(itemToRemove);
-        return ResponseEntity.ok(myRestAPIInformation);
+        myRestAPIRequestInformation.remove(itemToRemove);
+        return ResponseEntity.ok(myRestAPIRequestInformation);
     }
 }
