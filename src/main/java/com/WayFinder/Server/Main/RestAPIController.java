@@ -1,5 +1,6 @@
 package com.WayFinder.Server.Main;
 
+import com.WayFinder.Server.Main.MainServer.MainClass;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class RestAPIController {
     private List<RestAPIRequestInformation> myRestAPIRequestInformation = new ArrayList();
     private final AtomicLong counter = new AtomicLong();
+    private MainClass mainClass = new MainClass();
 
     public RestAPIController(){
         //note not sure which one to do
@@ -43,7 +45,9 @@ public class RestAPIController {
     public ResponseEntity addToUserList(@RequestBody RestAPIRequestInformation request) {
         if(request!=null){
             System.out.println("Success");
+            mainClass.runRequest(request);
             myRestAPIRequestInformation.add(request);
+
         }
 
         return ResponseEntity.ok(myRestAPIRequestInformation);
