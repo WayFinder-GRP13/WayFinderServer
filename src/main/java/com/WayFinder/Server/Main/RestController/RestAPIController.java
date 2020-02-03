@@ -1,6 +1,7 @@
-package com.WayFinder.Server.Main;
+package com.WayFinder.Server.Main.RestController;
 
 import com.WayFinder.Server.Main.MainServer.MainClass;
+import com.WayFinder.Server.Main.Model.RestAPIRequestInformation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
@@ -72,4 +73,7 @@ public class RestAPIController {
         myRestAPIRequestInformation.remove(itemToRemove);
         return ResponseEntity.ok(myRestAPIRequestInformation);
     }
+
+
+
 }

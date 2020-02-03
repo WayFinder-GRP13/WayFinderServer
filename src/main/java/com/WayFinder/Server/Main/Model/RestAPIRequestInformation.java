@@ -1,4 +1,4 @@
-package com.WayFinder.Server.Main;
+package com.WayFinder.Server.Main.Model;
 
 import com.WayFinder.Server.Main.UserSettings.UserSettings;
 import com.google.maps.model.LatLng;
