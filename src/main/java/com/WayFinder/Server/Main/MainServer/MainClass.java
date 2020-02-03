@@ -5,6 +5,6 @@ import com.WayFinder.Server.Main.Model.RestAPIRequestInformation;
 public class MainClass{
 
     public void runRequest(RestAPIRequestInformation request) {
-        
+
     }
 }
