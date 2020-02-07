@@ -1,9 +1,8 @@
-package com.WayFinder.Server.Main;
+package com.WayFinder.Server.Main.RestController;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,21 +10,19 @@ import java.io.InputStreamReader;
 import java.net.*;
 import java.util.ArrayList;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import com.WayFinder.Server.Main.Models.Luas;
-import com.WayFinder.Server.Main.Parsers.LuasAPIParser;
+import com.WayFinder.Server.Main.Models.Bike;
+import com.WayFinder.Server.Main.Parsers.BikesAPIParser;
 
 @RestController
-public class LuasAPIController {
-    // "/bikes?lat=12121&long=2232"
-    @GetMapping(value = "/luas")
-    public ResponseEntity getLuasStops() throws IOException, SAXException, ParserConfigurationException
+public class BikesAPIController {
+    //"/bikes?lat=12121&long=2232"
+    @GetMapping(value = "/bikes")
+    public ResponseEntity getBikes() throws IOException
     {
-        URL url = new URL("https://luasforecasts.rpa.ie/xml/get.ashx?action=stops&encrypt=false");
+        URL url = new URL("https://api.jcdecaux.com/vls/v1/stations?contract=dublin&apiKey=215780862e2545500c919b4f5e8e2419ddc36b6c");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");    
-        con.setRequestProperty("Content-Type", "application/xml");
+        con.setRequestProperty("Content-Type", "application/json");
 
         int responseCode = con.getResponseCode();
         String readLine = null;
@@ -35,10 +32,10 @@ public class LuasAPIController {
             while((readLine = in.readLine()) != null){
                 response.append(readLine);
             }
+            ArrayList<Bike> bikes = new ArrayList<Bike>(); 
+            bikes = BikesAPIParser.Parse(response.toString());
             in.close();
-            ArrayList<Luas> luasStops = new ArrayList<Luas>();
-            luasStops = LuasAPIParser.Parse(response.toString());
-            return ResponseEntity.ok(luasStops);
+            return ResponseEntity.ok(bikes);
         }
         else{
             return ResponseEntity.ok("System Error");
