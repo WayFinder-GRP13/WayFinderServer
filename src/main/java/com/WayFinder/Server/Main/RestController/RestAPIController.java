@@ -2,6 +2,7 @@ package com.WayFinder.Server.Main.RestController;
 
 import com.WayFinder.Server.Main.MainServer.MainClass;
 import com.WayFinder.Server.Main.Model.RestAPIRequestInformation;
+import com.WayFinder.Server.Main.NodeCreation.NodeCreationManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
@@ -16,6 +17,8 @@ public class RestAPIController {
 
     public RestAPIController(){
         //note not sure which one to do
+
+
 
 
     }

@@ -1,13 +1,17 @@
 package com.WayFinder.Server.Main.NodeCreation;
 
 public class Node {
-    
-    int TransportType;
-    double latitude;
-    double longitudue;
-    double score;
 
-    public Node(int TransportType,double latitude, double longitudue, double score) {
+    private String Name;
+    private int StopId;
+    private int TransportType;
+    private double latitude;
+    private double longitudue;
+    private double score;
+
+    public Node(String Name,int StopId,int TransportType,double latitude, double longitudue, double score) {
+        this.Name=Name;
+        this.StopId=StopId;
         this.latitude = latitude;
         this.longitudue = longitudue;
         this.score = score;
@@ -45,6 +49,25 @@ public class Node {
     }
 
 
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        Name = name;
+    }
+
+    public int getStopId() {
+        return StopId;
+    }
+
+    public void setStopId(int stopId) {
+        StopId = stopId;
+    }
+
+    public void printNode(){
+        System.out.println("Node is: "+TransportType+" stop name is: "+Name+"stop ID is: "+StopId+" Lat: "+latitude+" Lng: "+longitudue);
+    }
 }
 
 
