@@ -114,6 +114,7 @@ public class NodeCreationManager {
             Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
             lgr.log(Level.SEVERE, ex.getMessage(), ex);
         }
+        long startTime = System.currentTimeMillis();
         try (Connection con = DriverManager.getConnection(url, props);
              Statement st1 = con.createStatement();
              ResultSet rs1 = st1.executeQuery(BusNodesQuery)) {
@@ -132,7 +133,9 @@ public class NodeCreationManager {
                 BusNodeList.add(busNode);
                 System.out.println("");
             }
+            long endTime = System.currentTimeMillis();
 
+            System.out.println("That took " + (endTime - startTime) + " milliseconds");
 
         } catch (SQLException ex) {
 
