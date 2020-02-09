@@ -90,12 +90,13 @@ public class NodeCreationManager {
                                 "  dublinbusstops.geom && ST_MakeEnvelope("+StartLatCOORD+","+ StartLngCOORD+","+ EndLatCOORD+","+ EndLngCOORD+",4326);";
 
         //database connection
-        String url = "jdbc:postgresql://ec2-100-26-88-55.compute-1.amazonaws.com:5432/d7skpcjr074hru";
+        String url = "jdbc:postgresql://ec2-46-137-177-160.eu-west-1.compute.amazonaws.com:5432/d9d9eb795ebrsl";
+        //ec2-46-137-177-160.eu-west-1.compute.amazonaws.com
 
         //connection properties
         Properties props = new Properties();
-        props.setProperty("user","qsmlljfzcqdiux");
-        props.setProperty("password","171628e45eb433ca4a6963ee5dd08fe73f6521a06e96b8d6ab5ee2393f446905");
+        props.setProperty("user","bwtgzdutmqrmca");
+        props.setProperty("password","8b0a6af0e5d2a05bd6a462e8fb42320d0786a857ee56fd4aa4df9193583bd697");
         props.setProperty("sslmode","require");
 
 
