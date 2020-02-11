@@ -56,6 +56,18 @@ public class RestAPIController {
 
         return ResponseEntity.ok(myRestAPIRequestInformation);
     }
+
+    @PostMapping(value = "/railapi")
+    public ResponseEntity railResponse(@RequestBody RestAPIRequestInformation request) {
+        if(request!=null){
+            System.out.println("Success");
+
+
+        }
+
+        return ResponseEntity.ok(myRestAPIRequestInformation);
+    }
+
     //Update/Replace
     @PutMapping(value = "/")
     public ResponseEntity updateUserList(@RequestParam(value="name") String name, @RequestParam(value="id") Long id) {

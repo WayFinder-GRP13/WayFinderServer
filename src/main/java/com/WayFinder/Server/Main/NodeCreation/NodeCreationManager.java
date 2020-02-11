@@ -1,5 +1,7 @@
 package com.WayFinder.Server.Main.NodeCreation;
 
+import com.WayFinder.Server.Main.Models.BusStop;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -53,10 +55,10 @@ public class NodeCreationManager {
         // careful if altering this code: in western hemisphere minus latitude is right and plus latitude is left
         // top quadrant
         if (angle>=45.0&&angle<=135.0){
-            StartLatCOORD = StartLat - ((distance / 2) / (110.574));
-            EndLatCOORD = EndLat + ((distance / 2) / (110.574));
-            StartLngCOORD = StartLng - (ThresholdDistance / 2) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));
-            EndLngCOORD = EndLng + (ThresholdDistance / 2) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));
+            StartLatCOORD = StartLat - ((distance / 2) / (110.574));//.----->
+            EndLatCOORD = EndLat + ((distance / 2) / (110.574));//<------.
+            StartLngCOORD = StartLng - (ThresholdDistance / 2) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));//down
+            EndLngCOORD = EndLng + (ThresholdDistance / 2) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));//^
         }
         // left quadrant
         else if(angle>=135.0&&angle<=-135.0){
@@ -67,8 +69,8 @@ public class NodeCreationManager {
         }
         //bottom quadrant
         else if(angle>=-135.0&&angle<=-45.0){
-            StartLatCOORD = StartLat - ((distance / 2) / (110.574));
-            EndLatCOORD = EndLat + ((distance / 2) / (110.574));
+            StartLatCOORD = StartLat + ((distance / 2) / (110.574));
+            EndLatCOORD = EndLat - ((distance / 2) / (110.574));
             StartLngCOORD = StartLng + (ThresholdDistance / 2) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));
             EndLngCOORD = EndLng - (ThresholdDistance / 2) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));
         }
@@ -76,10 +78,12 @@ public class NodeCreationManager {
         else if(angle>=-45.0&&angle<=45.0){
             StartLatCOORD = StartLat + ((ThresholdDistance / 2) / (110.574));
             EndLatCOORD = EndLat - ((ThresholdDistance / 2) / (110.574));
-            StartLngCOORD = StartLng - (distance / 2)/(111.320*Math.cos(Math.toRadians(StartLatCOORD)));
-            EndLngCOORD = EndLng + (distance / 2) / (111.320 * Math.cos(Math.toRadians(EndLatCOORD)));
+            StartLngCOORD = StartLng + (distance / 2)/(111.320*Math.cos(Math.toRadians(StartLatCOORD)));
+            EndLngCOORD = EndLng - (distance / 2) / (111.320 * Math.cos(Math.toRadians(EndLatCOORD)));
         }
-
+        System.out.println("Angle is: "+angle);
+        System.out.println("This is the old position for the bounding box: lat: "+StartLat+","+StartLng);
+        System.out.println("This is the old position for the bounding box: lat: "+EndLat+","+EndLng);
         System.out.println("This is the new position for the bounding box: lat: "+EndLatCOORD+","+EndLngCOORD);
         System.out.println("This is the new position for the bounding box: lat: "+StartLatCOORD+","+StartLngCOORD);
 
@@ -88,6 +92,18 @@ public class NodeCreationManager {
                                 "FROM dublinbusstops\n" +
                                 "WHERE \n" +
                                 "  dublinbusstops.geom && ST_MakeEnvelope("+StartLatCOORD+","+ StartLngCOORD+","+ EndLatCOORD+","+ EndLngCOORD+",4326);";
+
+
+        String BusNodesDistanceQueryStartPoint =  "SELECT  st_distance_sphere(st_point("+StartLat+", "+StartLng+"), st_point(dublinbusstops.x, dublinbusstops.y))\n"+
+                "FROM dublinbusstops\n"+
+                "WHERE dublinbusstops.geom && ST_MakeEnvelope("+StartLatCOORD+","+ StartLngCOORD+","+ EndLatCOORD+","+ EndLngCOORD+", 4326)\n";
+
+
+
+        String BusNodesDistanceQueryEndPoint =  "SELECT  st_distance_sphere(st_point("+EndLat+", "+EndLng+"), st_point(dublinbusstops.x, dublinbusstops.y))\n"+
+                "FROM dublinbusstops\n"+
+                "WHERE dublinbusstops.geom && ST_MakeEnvelope("+StartLatCOORD+","+ StartLngCOORD+","+ EndLatCOORD+","+ EndLngCOORD+", 4326)\n";
+
 
         //database connection
         String url = "jdbc:postgresql://ec2-46-137-177-160.eu-west-1.compute.amazonaws.com:5432/d9d9eb795ebrsl";
@@ -115,6 +131,7 @@ public class NodeCreationManager {
             Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
             lgr.log(Level.SEVERE, ex.getMessage(), ex);
         }
+
         long startTime = System.currentTimeMillis();
         try (Connection con = DriverManager.getConnection(url, props);
              Statement st1 = con.createStatement();
@@ -138,18 +155,77 @@ public class NodeCreationManager {
 
             System.out.println("That took " + (endTime - startTime) + " milliseconds");
 
+
+
         } catch (SQLException ex) {
 
             Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
             lgr.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
+
+
+        //get distance to start point
+        try (Connection con2 = DriverManager.getConnection(url, props);
+             Statement st2 = con2.createStatement();
+             ResultSet rs2 = st2.executeQuery(BusNodesDistanceQueryStartPoint)) {
+
+            ResultSetMetaData rsmd = rs2.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
+            int counter=0;
+            while (rs2.next()) {
+                for (int i = 1; i <= columnsNumber; i++) {
+                    if (i > 1) System.out.print(",  ");
+                    String columnValue = rs2.getString(i);
+                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                }
+                Node currentStop = BusNodeList.get(counter);
+                currentStop.setDistanceToStartLocation(rs2.getDouble(1));
+                System.out.println("");
+                counter=counter+1;
+            }
+        } catch (SQLException ex) {
+
+            Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
+            lgr.log(Level.SEVERE, ex.getMessage(), ex);
+        }
+
+
+
+
+        //get distance to end point
+        try (Connection con3 = DriverManager.getConnection(url, props);
+             Statement st3 = con3.createStatement();
+             ResultSet rs3 = st3.executeQuery(BusNodesDistanceQueryEndPoint)) {
+
+            ResultSetMetaData rsmd = rs3.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
+            int counter=0;
+            while (rs3.next()) {
+                for (int i = 1; i <= columnsNumber; i++) {
+                    if (i > 1) System.out.print(",  ");
+                    String columnValue = rs3.getString(i);
+                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                }
+                Node currentStop = BusNodeList.get(counter);
+                currentStop.setDistanceToEndLocation(rs3.getDouble(1));
+                System.out.println("");
+                counter=counter+1;
+            }
+
+
+        } catch (SQLException ex) {
+
+            Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
+            lgr.log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        for(Node node:BusNodeList) {
+            System.out.println("here:"+node.getDistanceToStartLocation());
+            System.out.println("here1:"+node.getDistanceToEndLocation());
+        }
         return BusNodeList;
     }
 
 }
-
-
-
 
 
