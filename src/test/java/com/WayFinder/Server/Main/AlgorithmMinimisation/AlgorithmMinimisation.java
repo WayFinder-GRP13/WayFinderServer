@@ -19,12 +19,12 @@ public class AlgorithmMinimisation {
         @Test
         public void testMinimisation(){
             ArrayList<Node> busList = nodeCreation.getNodes(53.355811, -6.228165,53.351816, -6.223656);
-            ArrayList<BusStop> minimisedBusList =nodeMinimisation.minimiseBusStops(busList);
+            ArrayList<Node> minimisedBusList =nodeMinimisation.minimiseBusStops(busList);
             //size
             assertEquals(2,minimisedBusList.size());
             //id of each expected return stop
-            assertEquals(2508,minimisedBusList.get(0).getBusStopID());
-            assertEquals(2262,minimisedBusList.get(1).getBusStopID());
+            assertEquals("2508",minimisedBusList.get(0).getStopId());
+            assertEquals("2262",minimisedBusList.get(1).getStopId());
 
 
         }

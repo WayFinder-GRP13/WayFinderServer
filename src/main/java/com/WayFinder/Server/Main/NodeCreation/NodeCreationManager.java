@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 public class NodeCreationManager {
     private ArrayList<Node> BusNodeList;
 
+    //pg:killall --app group13aseserver= to clear all connections
     public NodeCreationManager(){
         BusNodeList = new ArrayList();
     }

@@ -1,19 +1,24 @@
 package com.WayFinder.Server.Main.NodeCreation;
 
+import com.WayFinder.Server.Main.DijkstraAlgorithm.Vertex;
+
+import java.util.ArrayList;
+
 public class Node {
 
     private String Name;
-    private int StopId;
+    private String StopId;
     private int TransportType;
     private double latitude;
     private double longitudue;
     private double score;
     private double distanceToStartLocation;
     private double distanceToEndLocation;
+    private ArrayList<String> TransportRoute;
 
     public Node(String Name,int StopId,int TransportType,double latitude, double longitudue, double score) {
         this.Name=Name;
-        this.StopId=StopId;
+        this.StopId=Integer.toString(StopId);
         this.latitude = latitude;
         this.longitudue = longitudue;
         this.score = score;
@@ -69,11 +74,11 @@ public class Node {
         Name = name;
     }
 
-    public int getStopId() {
+    public String getStopId() {
         return StopId;
     }
 
-    public void setStopId(int stopId) {
+    public void setStopId(String stopId) {
         StopId = stopId;
     }
 
@@ -95,6 +100,39 @@ public class Node {
 
     public void setDistanceToEndLocation(double distanceToEndLocation) {
         this.distanceToEndLocation = distanceToEndLocation;
+    }
+
+    public ArrayList<String> getTransportRoute() {
+        return TransportRoute;
+    }
+
+    public void setTransportRoute(ArrayList<String> transportRoute) {
+        TransportRoute = transportRoute;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((StopId == null) ? 0 : StopId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Node other = (Node) obj;
+        if (StopId == null) {
+            if (other.StopId != null)
+                return false;
+        } else if (!StopId.equals(other.StopId))
+            return false;
+        return true;
     }
 }
 

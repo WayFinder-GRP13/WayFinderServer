@@ -1,5 +1,6 @@
 package com.WayFinder.Server.Main;
 
+import com.WayFinder.Server.Main.DijkstraAlgorithm.DijkstraAlgorithmManager;
 import com.WayFinder.Server.Main.Models.BusStop;
 import com.WayFinder.Server.Main.NodeCreation.Node;
 import com.WayFinder.Server.Main.NodeCreation.NodeCreationManager;
@@ -18,10 +19,10 @@ public class MainApplication {
 		SpringApplication.run(MainApplication.class, args);
 		//test code
 		NodeCreationManager NodeCreationManager=new NodeCreationManager();
-		ArrayList<Node> busStopList = NodeCreationManager.getNodes(53.355811, -6.228165,53.351816, -6.223656);
+		ArrayList<Node> busStopList = NodeCreationManager.getNodes(53.364084, -6.280115,53.349355, -6.208735);
 
-		NodeMinimisation nodeMinimisation = new NodeMinimisation();
-		nodeMinimisation.minimiseBusStops(busStopList);
+		//NodeMinimisation nodeMinimisation = new NodeMinimisation();
+		//ArrayList<Node> BusStops = nodeMinimisation.minimiseBusStops(busStopList);
 //		BusAPIController busAPI = new BusAPIController();
 //		try {
 //			//busAPI.getBusStopInfo(147);
@@ -29,6 +30,8 @@ public class MainApplication {
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
+		DijkstraAlgorithmManager runNodeGraph = new DijkstraAlgorithmManager();
+		runNodeGraph.ExecuteAlgorithm(busStopList);
 	}
 
 }

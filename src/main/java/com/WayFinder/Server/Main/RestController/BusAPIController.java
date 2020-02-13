@@ -19,7 +19,7 @@ public class BusAPIController {
 
         //"/busstopinformation?stopid=147"
         @GetMapping(value = "/busstopinformation")
-        public ArrayList<BusStop> getBusStopInfo(int stopNumber) throws IOException
+        public ArrayList<BusStop> getBusStopInfo(String stopNumber) throws IOException
         {
             URL url = new URL("https://data.smartdublin.ie/cgi-bin/rtpi/busstopinformation?stopid="+stopNumber);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
