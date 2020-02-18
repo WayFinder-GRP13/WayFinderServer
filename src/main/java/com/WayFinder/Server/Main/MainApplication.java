@@ -1,16 +1,20 @@
 package com.WayFinder.Server.Main;
 
 import com.WayFinder.Server.Main.DijkstraAlgorithm.DijkstraAlgorithmManager;
+import com.WayFinder.Server.Main.DijkstraAlgorithm.Edge;
 import com.WayFinder.Server.Main.Models.BusStop;
 import com.WayFinder.Server.Main.NodeCreation.Node;
 import com.WayFinder.Server.Main.NodeCreation.NodeCreationManager;
 import com.WayFinder.Server.Main.NodeMinimisation.NodeMinimisation;
 import com.WayFinder.Server.Main.RestController.BusAPIController;
+import com.WayFinder.Server.Main.RouteWeightCalculation.RouteWeightCalculationManager;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 @SpringBootApplication
 public class MainApplication {
@@ -21,17 +25,18 @@ public class MainApplication {
 		NodeCreationManager NodeCreationManager=new NodeCreationManager();
 		ArrayList<Node> busStopList = NodeCreationManager.getNodes(53.364084, -6.280115,53.349355, -6.208735);
 
-		//NodeMinimisation nodeMinimisation = new NodeMinimisation();
-		//ArrayList<Node> BusStops = nodeMinimisation.minimiseBusStops(busStopList);
-//		BusAPIController busAPI = new BusAPIController();
-//		try {
-//			//busAPI.getBusStopInfo(147);
-//			busAPI.getRouteInformation(4);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		NodeMinimisation nodeMinimisation = new NodeMinimisation();
+		ArrayList<Node> BusStopsNodes = nodeMinimisation.minimiseBusStops(busStopList);
+
+		RouteWeightCalculationManager routeWeightCalculationManager= new RouteWeightCalculationManager();
+		ArrayList<Edge> edgeList = routeWeightCalculationManager.calculateRouteWeights(BusStopsNodes);
+
 		DijkstraAlgorithmManager runNodeGraph = new DijkstraAlgorithmManager();
-		runNodeGraph.ExecuteAlgorithm(busStopList);
+		LinkedList<Node> finalPath = runNodeGraph.ExecuteAlgorithm(busStopList,edgeList);
+
+		for (Node node : finalPath) {
+			System.out.println(node.getStopId());
+		}
 	}
 
 }

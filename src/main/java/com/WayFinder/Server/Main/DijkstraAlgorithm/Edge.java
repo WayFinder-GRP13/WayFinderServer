@@ -7,12 +7,14 @@ public class Edge {
     private final Node source;
     private final Node destination;
     private final int weight;
+    private final int transportType;
 
-    public Edge(String id, Node source, Node destination, int weight) {
+    public Edge(String id, Node source, Node destination, int weight, int transportType) {
         this.id = id;
         this.source = source;
         this.destination = destination;
         this.weight = weight;
+        this.transportType = transportType;
     }
 
     public String getId() {
@@ -32,5 +34,9 @@ public class Edge {
     @Override
     public String toString() {
         return source + " " + destination;
+    }
+
+    public int getTransportType() {
+        return transportType;
     }
 }

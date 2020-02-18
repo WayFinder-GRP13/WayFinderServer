@@ -4,7 +4,7 @@ public class CarCl {
 
     public long CO2CalCar(long distance)
     {
-        long emmissions_per_CarMile = distance*1.17 //1.17lbs
+        long emmissions_per_CarMile = distance*(long)1.17; //1.17lbs
 
         return emmissions_per_CarMile;
 

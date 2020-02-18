@@ -3,7 +3,6 @@ package com.WayFinder.Server.Main.NodeGraphTest;
 import com.WayFinder.Server.Main.DijkstraAlgorithm.DijkstraAlgorithm;
 import com.WayFinder.Server.Main.DijkstraAlgorithm.Edge;
 import com.WayFinder.Server.Main.DijkstraAlgorithm.Graph;
-import com.WayFinder.Server.Main.DijkstraAlgorithm.Vertex;
 import com.WayFinder.Server.Main.NodeCreation.Node;
 import org.junit.Test;
 
@@ -58,7 +57,7 @@ public class TestDijkstraAlgorithm {
 
     private void addLane(String laneId, int sourceLocNo, int destLocNo,
                          int duration) {
-        Edge lane = new Edge(laneId,nodes.get(sourceLocNo), nodes.get(destLocNo), duration );
+        Edge lane = new Edge(laneId,nodes.get(sourceLocNo), nodes.get(destLocNo), duration, transportType);
         edges.add(lane);
     }
 }
