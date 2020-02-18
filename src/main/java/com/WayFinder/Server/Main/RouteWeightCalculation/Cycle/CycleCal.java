@@ -1,4 +1,4 @@
-package com.WayFinder.Server.Main.RouteWeightCalculation;
+package com.WayFinder.Server.Main.RouteWeightCalculation.Cycle;
 
 public class RouteWeightCalculationManager {
 }
