@@ -28,11 +28,14 @@ public class MainApplication {
 		NodeMinimisation nodeMinimisation = new NodeMinimisation();
 		ArrayList<Node> BusStopsNodes = nodeMinimisation.minimiseBusStops(busStopList);
 
+		System.out.println("Bus stop list size: "+BusStopsNodes.size());
+
 		RouteWeightCalculationManager routeWeightCalculationManager= new RouteWeightCalculationManager();
 		ArrayList<Edge> edgeList = routeWeightCalculationManager.calculateRouteWeights(BusStopsNodes);
 
+		System.out.println("final edge list size: "+edgeList.size());
 		DijkstraAlgorithmManager runNodeGraph = new DijkstraAlgorithmManager();
-		LinkedList<Node> finalPath = runNodeGraph.ExecuteAlgorithm(busStopList,edgeList);
+		LinkedList<Node> finalPath = runNodeGraph.ExecuteAlgorithm(BusStopsNodes,edgeList);
 
 		for (Node node : finalPath) {
 			System.out.println(node.getStopId());

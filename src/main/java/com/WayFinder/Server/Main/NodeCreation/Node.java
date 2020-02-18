@@ -19,6 +19,7 @@ public class Node {
     public Node(String Name,int StopId,int TransportType,double latitude, double longitudue, double score) {
         this.Name=Name;
         this.StopId=Integer.toString(StopId);
+        this.TransportType=TransportType;
         this.latitude = latitude;
         this.longitudue = longitudue;
         this.score = score;
@@ -29,6 +30,7 @@ public class Node {
         this.StopId=node.getStopId();
         this.latitude = node.getLatitude();
         this.longitudue = node.getLongitudue();
+        this.TransportType=node.getTransportType();
         this.score = node.getScore();
         this.distanceToStartLocation=node.getDistanceToStartLocation();
         this.distanceToEndLocation=node.getDistanceToEndLocation();

@@ -7,7 +7,7 @@ import com.WayFinder.Server.Main.RouteWeightCalculation.Bus.BusWeightCalculation
 import java.util.ArrayList;
 
 public class RouteWeightCalculationManager {
-    private BusWeightCalculation busWeightCalculation;
+    private BusWeightCalculation busWeightCalculation=new BusWeightCalculation();
 
 
     public ArrayList<Edge> calculateRouteWeights(ArrayList<Node> NodeList){

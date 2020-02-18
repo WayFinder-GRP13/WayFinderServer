@@ -80,10 +80,11 @@ public class NodeMinimisation {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (doubleBreak==true){
-                    break;
-                }
 
+
+            }
+            if (doubleBreak==true){
+                break;
             }
             System.out.println("final route list");
             System.out.println(StartStopInformation.getBusRouteList());
@@ -92,7 +93,7 @@ public class NodeMinimisation {
         try {
             //for each route that was linked get bus stops on the route and inside the bounding box
             for(String RouteNumber:StartStopInformation.getBusRouteList()) {
-                BusRoute route = busAPIController.getRouteInformation(Integer.parseInt(RouteNumber));
+                BusRoute route = busAPIController.getRouteInformation(RouteNumber);
 
                 for (Node busStop : initialStopList) {
                     for (BusStop routeBusStop : route.getBusStopList()) {

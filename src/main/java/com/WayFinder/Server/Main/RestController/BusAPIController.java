@@ -52,7 +52,7 @@ public class BusAPIController {
 
     //"/busRouteInformation?routeid=4"
     @GetMapping(value = "/busRouteInformation")
-    public BusRoute getRouteInformation(int routeNumber) throws IOException
+    public BusRoute getRouteInformation(String routeNumber) throws IOException
     {
         URL url = new URL("https://data.smartdublin.ie/cgi-bin/rtpi/routeinformation?routeid="+routeNumber+"&operator=bac");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
