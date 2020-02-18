@@ -1,6 +1,6 @@
 package com.WayFinder.Server.Main.RouteWeightCalculation.Car;
 
-public class RouteWeightCalculationManager {
+public class CarCl {
 }
 
 public long CO2CalCar(long distance)

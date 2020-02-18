@@ -1,7 +1,7 @@
-package com.WayFinder.Server.Main.RouteWeightCalculation.Car;
+package com.WayFinder.Server.Main.RouteWeightCalculation.Bus;
 
 
-public class RouteWeightCalculationManager {
+public class BusCal {
 
 
 }

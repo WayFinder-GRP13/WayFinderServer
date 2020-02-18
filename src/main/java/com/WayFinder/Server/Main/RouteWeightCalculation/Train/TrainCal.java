@@ -1,6 +1,6 @@
 package com.WayFinder.Server.Main.RouteWeightCalculation.Train;
 
-public class RouteWeightCalculationManager {
+public class Train {
 }
 
 public long CO2CalTrain(long distance)
