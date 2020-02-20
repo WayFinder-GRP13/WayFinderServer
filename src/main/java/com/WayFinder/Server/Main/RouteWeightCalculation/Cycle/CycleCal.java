@@ -49,16 +49,11 @@ public class CycleCal {
 
                 case 1:
                     return (0.50);
-
                 case 2:
                     return (1.50);
 
-
                 case 3:
-
                     return (3.50);
-
-
                 case 4:
                     return (6.50);
 
