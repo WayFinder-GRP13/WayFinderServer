@@ -47,6 +47,7 @@ public class NodeCreationManager {
         double EndLatCOORD=EndLat;
         double StartLngCOORD=StartLng;
         double EndLngCOORD=EndLng;
+        double distanceScale = 6.0;
         System.out.println("Distance is: "+distanceTo(StartLat, StartLng,EndLat, EndLng, "K"));
 
         double distance = distanceTo(StartLat, StartLng,EndLat, EndLng, "K");
@@ -56,31 +57,31 @@ public class NodeCreationManager {
         // careful if altering this code: in western hemisphere minus latitude is right and plus latitude is left
         // top quadrant
         if (angle>=45.0&&angle<=135.0){
-            StartLatCOORD = StartLat - ((distance / 2) / (110.574));//.----->
-            EndLatCOORD = EndLat + ((distance / 2) / (110.574));//<------.
-            StartLngCOORD = StartLng - (ThresholdDistance / 2) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));//down
-            EndLngCOORD = EndLng + (ThresholdDistance / 2) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));//^
+            StartLatCOORD = StartLat - ((distance / distanceScale) / (110.574));//.----->
+            EndLatCOORD = EndLat + ((distance / distanceScale) / (110.574));//<------.
+            StartLngCOORD = StartLng - (ThresholdDistance ) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));//down
+            EndLngCOORD = EndLng + (ThresholdDistance ) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));//^
         }
         // left quadrant
         else if(angle>=135.0&&angle<=-135.0){
-            StartLatCOORD = StartLat - ((ThresholdDistance / 2) / (110.574));
-            EndLatCOORD = EndLat + ((ThresholdDistance / 2) / (110.574));
-            StartLngCOORD = StartLng - (distance / 2) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));
-            EndLngCOORD = EndLng + (distance / 2) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));
+            StartLatCOORD = StartLat - ((ThresholdDistance ) / (110.574));
+            EndLatCOORD = EndLat + ((ThresholdDistance ) / (110.574));
+            StartLngCOORD = StartLng - (distance / distanceScale) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));
+            EndLngCOORD = EndLng + (distance / distanceScale) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));
         }
         //bottom quadrant
         else if(angle>=-135.0&&angle<=-45.0){
-            StartLatCOORD = StartLat + ((distance / 2) / (110.574));
-            EndLatCOORD = EndLat - ((distance / 2) / (110.574));
-            StartLngCOORD = StartLng + (ThresholdDistance / 2) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));
-            EndLngCOORD = EndLng - (ThresholdDistance / 2) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));
+            StartLatCOORD = StartLat + ((distance / distanceScale) / (110.574));
+            EndLatCOORD = EndLat - ((distance / distanceScale) / (110.574));
+            StartLngCOORD = StartLng + (ThresholdDistance ) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));
+            EndLngCOORD = EndLng - (ThresholdDistance) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));
         }
         // right quadrant
         else if(angle>=-45.0&&angle<=45.0){
-            StartLatCOORD = StartLat + ((ThresholdDistance / 2) / (110.574));
-            EndLatCOORD = EndLat - ((ThresholdDistance / 2) / (110.574));
-            StartLngCOORD = StartLng + (distance / 2)/(111.320*Math.cos(Math.toRadians(StartLatCOORD)));
-            EndLngCOORD = EndLng - (distance / 2) / (111.320 * Math.cos(Math.toRadians(EndLatCOORD)));
+            StartLatCOORD = StartLat + ((ThresholdDistance ) / (110.574));
+            EndLatCOORD = EndLat - ((ThresholdDistance) / (110.574));
+            StartLngCOORD = StartLng + (distance / distanceScale)/(111.320*Math.cos(Math.toRadians(StartLatCOORD)));
+            EndLngCOORD = EndLng - (distance / distanceScale) / (111.320 * Math.cos(Math.toRadians(EndLatCOORD)));
         }
         System.out.println("Angle is: "+angle);
         System.out.println("This is the old position for the bounding box: lat: "+StartLat+","+StartLng);
