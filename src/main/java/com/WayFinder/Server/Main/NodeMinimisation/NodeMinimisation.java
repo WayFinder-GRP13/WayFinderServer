@@ -18,6 +18,7 @@ public class NodeMinimisation {
         ArrayList<Node> SortedDistanceStartNodes=new ArrayList<>();
         ArrayList<Node> SortedDistanceEndNodes=new ArrayList<>();
         ArrayList<Node> minimisedBusStopList = new ArrayList<>();
+        ArrayList<Node> finalOutputList = new ArrayList<>();
 
         //sort distance into smallest to largest
         Collections.sort(initialStopList, Comparator.comparingDouble(Node::getDistanceToStartLocation));
@@ -116,6 +117,9 @@ public class NodeMinimisation {
                     }
                 }
             }
+            //removes close bus stops
+            double previousStopDistance = 0;
+            int index = 1;
             System.out.println("Dup removed: Final bus list");
             for(Node stop:minimisedBusStopList) {
                 System.out.println("ID: "+stop.getStopId());
@@ -125,11 +129,22 @@ public class NodeMinimisation {
                 System.out.println("lat: "+stop.getLatitude());
                 System.out.println("lng: "+stop.getLongitudue());
 
+                //makes sure first and last node isint included
+                if(previousStopDistance!=0&&index!=minimisedBusStopList.size()){
+                    if(stop.getDistanceToStartLocation()-previousStopDistance>500){
+                        finalOutputList.add(stop);
+                    }
+                }
+                //sets previous stop distance
+                index+=1;
+                previousStopDistance=stop.getDistanceToStartLocation();
+
+
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return minimisedBusStopList;
+        return finalOutputList;
     }
 }
