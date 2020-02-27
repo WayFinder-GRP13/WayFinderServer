@@ -9,7 +9,7 @@ public class CycleCal {
 
 
     public double CO2CalCycle(double distance) {
-        double emmissions_per_CycleMile = distance * (double) 0.011;// 0.0110231
+        double emmissions_per_CycleMile = distance * 0.011;// 0.0110231
 
         return emmissions_per_CycleMile;
 
@@ -22,7 +22,7 @@ public class CycleCal {
      * Returns -->  cycle time in hours
      */
     public double CycleTime(double distance) {
-        double CycleTime = distance / (double) 22.00;
+        double CycleTime = distance /22.00;
         return (CycleTime);
     }
 
@@ -75,7 +75,7 @@ public class CycleCal {
         int total = timeTotal;
         total = total - 4;
         double tripCost = total * 0.50;
-        return ((double) tripCost);
+        return (tripCost);
     }
 
 }

@@ -9,7 +9,7 @@ public class CarCl {
     }
 
     public double CO2CalCar(double distance) {
-        double emmissions_per_CarMile = distance * (double) 1.17; //1.17lbs
+        double emmissions_per_CarMile = distance * 1.17; //1.17lbs
 
         return emmissions_per_CarMile;
 
