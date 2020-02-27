@@ -26,7 +26,7 @@ public class RouteJSONData {
 
             apiRequest.append("origin="+origin.getLatitude()+","+origin.getLongitudue()+"&");
             apiRequest.append("destination="+destination.getLatitude()+","+destination.getLongitudue()+"&");
-            apiRequest.append("mode="+routeTypes.get(getTransitType(edgeList,origin,destination)));
+            apiRequest.append("mode=driving");//+routeTypes.get(getTransitType(edgeList,origin,destination)));
             apiRequest.append("&key=AIzaSyCqCdlPmegML3DEtc7BL9X1RFVsm8lEBbE");
 
             googleRequests.add(apiRequest.toString());

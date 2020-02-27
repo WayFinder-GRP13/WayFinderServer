@@ -21,19 +21,19 @@ public class FinalRoute{
         OverviewPolyline = overviewPolyline;
     }
 
-    public Node getDestination() {
-        return Destination;
-    }
-
-    public void setDestination(Node destination) {
-        Destination = destination;
-    }
-
     public Node getOrigin() {
         return Origin;
     }
 
     public void setOrigin(Node origin) {
         Origin = origin;
+    }
+
+    public Node getDestination() {
+        return Destination;
+    }
+
+    public void setDestination(Node destination) {
+        Destination = destination;
     }
 }

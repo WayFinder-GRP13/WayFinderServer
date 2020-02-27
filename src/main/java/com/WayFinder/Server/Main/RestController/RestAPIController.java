@@ -64,7 +64,7 @@ public class RestAPIController {
             myRestAPIRequestInformation.add(request);
 
             NodeCreationManager NodeCreationManager=new NodeCreationManager();
-            ArrayList<Node> busStopList = NodeCreationManager.getNodes(53.364084, -6.280115,53.349355, -6.208735);
+            ArrayList<Node> busStopList = NodeCreationManager.getNodes(request.getStartLocation().lat, request.getStartLocation().lng,request.getEndLocation().lat, request.getEndLocation().lng);
 
             NodeMinimisation nodeMinimisation = new NodeMinimisation();
             ArrayList<Node> BusStopsNodes = nodeMinimisation.minimiseBusStops(busStopList);
@@ -108,7 +108,6 @@ public class RestAPIController {
             }
 
         }
-
 
 
         return ResponseEntity.ok(result);
