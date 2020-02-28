@@ -74,17 +74,17 @@ public class MainApplication {
 //			System.out.println(obj.getDestination().getStopId());
 //			System.out.println(obj.getOverviewPolyline());
 //		}
-
+//
 //	String JsonRresult = "[{\"overviewPolyline\":\"cltdIhgbe@w@uAHUGKKRHLdAlBbBvCp@nAdCdEBE\",\"destination\":{\"latitude\":53.35611171,\"longitudue\":-6.244846799,\"score\":99,\"distanceToStartLocation\":4019.43240357,\"distanceToEndLocation\":4084.32419699,\"transportType\":1,\"stopId\":\"618\",\"transportRoute\":[\"53\"],\"name\":\"Newcomen Bridge\"},\"origin\":{\"latitude\":53.35768013,\"longitudue\":-6.242709027,\"score\":99,\"distanceToStartLocation\":4219.15887366,\"distanceToEndLocation\":3888.21577961,\"transportType\":1,\"stopId\":\"4384\",\"transportRoute\":[\"53\"],\"name\":\"Bayview Avenue\"}},{\"overviewPolyline\":\"ybtdInube@nAnBM^\",\"destination\":{\"latitude\":53.35572883,\"longitudue\":-6.24570384,\"score\":99,\"distanceToStartLocation\":3936.22103373,\"distanceToEndLocation\":4170.6943314,\"transportType\":1,\"stopId\":\"516\",\"transportRoute\":[\"53\"],\"name\":\"North Strand Road\"},\"origin\":{\"latitude\":53.35611171,\"longitudue\":-6.244846799,\"score\":99,\"distanceToStartLocation\":4019.43240357,\"distanceToEndLocation\":4084.32419699,\"transportType\":1,\"stopId\":\"618\",\"transportRoute\":[\"53\"],\"name\":\"Newcomen Bridge\"}},{\"overviewPolyline\":\"w`tdI~ybe@L_@V^xAnBzAfB~BqDzCqE|EgHZg@\",\"destination\":{\"latitude\":53.35205785,\"longitudue\":-6.243000423,\"score\":99,\"distanceToStartLocation\":4335.75218,\"distanceToEndLocation\":3821.84249407,\"transportType\":1,\"stopId\":\"7709\",\"transportRoute\":[\"32\"],\"name\":\"Seville Place\"},\"origin\":{\"latitude\":53.35572883,\"longitudue\":-6.24570384,\"score\":99,\"distanceToStartLocation\":3936.22103373,\"distanceToEndLocation\":4170.6943314,\"transportType\":1,\"stopId\":\"516\",\"transportRoute\":[\"53\"],\"name\":\"North Strand Road\"}},{\"overviewPolyline\":\"eisdIbjbe@Xa@p@gA\",\"destination\":{\"latitude\":53.35162049,\"longitudue\":-6.2425978,\"score\":99,\"distanceToStartLocation\":4393.30567232,\"distanceToEndLocation\":3773.6951472,\"transportType\":1,\"stopId\":\"7706\",\"transportRoute\":[\"31B\"],\"name\":\"Seville Place\"},\"origin\":{\"latitude\":53.35205785,\"longitudue\":-6.243000423,\"score\":99,\"distanceToStartLocation\":4335.75218,\"distanceToEndLocation\":3821.84249407,\"transportType\":1,\"stopId\":\"7709\",\"transportRoute\":[\"32\"],\"name\":\"Seville Place\"}}]";
 //		System.out.println(JsonRresult);
 //			//FinalRouteList data = new Gson().fromJson(JsonRresult, FinalRouteList.class);
 //		FinalRoute[] enums =new Gson().fromJson(JsonRresult, FinalRoute[].class);
-
-		// Show it.
+//
+//		 Show it.
 //		System.out.println(JsonRresult);
 ////		System.out.println(enums.length);
 ////		System.out.println(enums[0].getOverviewPolyline());
-
+//
 //		ArrayList<FinalRoute> finalRouteList = new ArrayList();
 //
 //		JSONArray scores = new JSONArray(JsonRresult);
@@ -104,6 +104,6 @@ public class MainApplication {
 //		}
 //		System.out.println(finalRouteList.get(0).getOverviewPolyline());
 //		System.out.println(finalRouteList.get(0).getOrigin().getLatitude());
+//	}
 	}
-
 }

@@ -18,6 +18,8 @@ public class RouteWeightCalculationManager {
             //ArrayList<Integer> weightList = new ArrayList<>();
             Node firstNode = NodeList.get(i);
             Node secondNode = NodeList.get(i+1);
+            System.out.println("Transport type node1 is: "+firstNode.getTransportType());
+            System.out.println("Transport type node2 is: "+secondNode.getTransportType());
 
             //need to check what type of transport calls need to be made
             //car

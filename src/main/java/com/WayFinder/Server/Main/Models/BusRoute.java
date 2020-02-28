@@ -1,10 +1,12 @@
 package com.WayFinder.Server.Main.Models;
 
+import com.WayFinder.Server.Main.NodeCreation.Node;
+
 import java.util.ArrayList;
 
 public class BusRoute {
     private String RouteName;
-    private ArrayList<BusStop> busStopList = new ArrayList<>();
+    private ArrayList<Node> busStopList = new ArrayList<>();
 
     public String getRouteName() {
         return RouteName;
@@ -14,11 +16,11 @@ public class BusRoute {
         RouteName = routeName;
     }
 
-    public ArrayList<BusStop> getBusStopList() {
+    public ArrayList<Node> getBusStopList() {
         return busStopList;
     }
 
-    public void addBusStop(BusStop busStop) {
+    public void addBusStop(Node busStop) {
         busStopList.add(busStop);
     }
 }

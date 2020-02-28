@@ -4,6 +4,7 @@ import com.WayFinder.Server.Main.Models.Bike;
 import com.WayFinder.Server.Main.Models.BusRoute;
 import com.WayFinder.Server.Main.Models.BusStop;
 import com.WayFinder.Server.Main.Models.Position;
+import com.WayFinder.Server.Main.NodeCreation.Node;
 import com.google.gson.JsonObject;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,34 +13,31 @@ import java.util.ArrayList;
 
 public class BusAPIParser {
 
-    public static ArrayList<BusStop> ParseBusStop(String busStopData){
-        ArrayList<BusStop> busStopList = new ArrayList<>();
+    public static Node ParseBusStop(String busStopData){
+        Node busStop = new Node();
         JSONObject obj = new JSONObject(busStopData);
-        System.out.println(obj);
         JSONArray Routedata = obj.getJSONArray("results");
 
         for (int i = 0; i < Routedata.length(); i++){
             JSONObject jsonobject = Routedata.getJSONObject(i);
-            System.out.println(jsonobject.toString());
-            BusStop busStop =  new BusStop();
+            busStop =  new Node();
 
-            busStop.setBusStopID(jsonobject.getInt("stopid"));//latitude/longitude/operators/routes
+            busStop.setStopId(jsonobject.getString("stopid"));//latitude/longitude/operators/routes
             busStop.setLatitude(jsonobject.getDouble("latitude"));
-            busStop.setLongitude(jsonobject.getDouble("longitude"));
+            busStop.setLongitudue(jsonobject.getDouble("longitude"));
 
             JSONArray operators = jsonobject.getJSONArray("operators");
             for (int x = 0; x < operators.length(); x++){
                 JSONObject opps = operators.getJSONObject(i);
                 JSONArray routes = opps.getJSONArray("routes");
                 for (int y = 0; y < routes.length(); y++){
-                    busStop.addToBusRouteList((String)routes.get(y));
+                    busStop.addTransportRouteToList((String)routes.get(y));
 
                 }
             }
 
-            busStopList.add(busStop);
         }
-        return busStopList;
+        return busStop;
     }
 
     public static BusRoute ParseBusRoute(String busRouteData){
@@ -54,18 +52,19 @@ public class BusAPIParser {
             JSONObject jsonobject = Routedata.getJSONObject(i);
             JSONArray stops = jsonobject.getJSONArray("stops");
             for (int j = 0; j < stops.length(); j++) {
-                BusStop busStop = new BusStop();
+                Node busStop = new Node();
                 JSONObject stop = stops.getJSONObject(j);
-                busStop.setBusStopID(stop.getInt("stopid"));//latitude/longitude/operators/routes
+                busStop.setStopId(stop.getString("stopid"));//latitude/longitude/operators/routes
                 busStop.setLatitude(stop.getDouble("latitude"));
-                busStop.setLongitude(stop.getDouble("longitude"));
+                busStop.setLongitudue(stop.getDouble("longitude"));
+                busStop.setTransportType(1);
 
                 JSONArray operators = stop.getJSONArray("operators");
                 for (int x = 0; x < operators.length(); x++) {
                     JSONObject opps = operators.getJSONObject(x);
                     JSONArray routes = opps.getJSONArray("routes");
                     for (int y = 0; y < routes.length(); y++) {
-                        busStop.addToBusRouteList(routes.get(y).toString());
+                        busStop.addTransportRouteToList(routes.get(y).toString());
 
                     }
                 }

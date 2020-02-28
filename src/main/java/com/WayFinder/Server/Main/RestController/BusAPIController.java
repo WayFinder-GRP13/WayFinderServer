@@ -3,6 +3,7 @@ package com.WayFinder.Server.Main.RestController;
 
 import com.WayFinder.Server.Main.Models.BusRoute;
 import com.WayFinder.Server.Main.Models.BusStop;
+import com.WayFinder.Server.Main.NodeCreation.Node;
 import com.WayFinder.Server.Main.Parsers.BusAPIParser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +20,7 @@ public class BusAPIController {
 
         //"/busstopinformation?stopid=147"
         @GetMapping(value = "/busstopinformation")
-        public ArrayList<BusStop> getBusStopInfo(String stopNumber) throws IOException
+        public Node getBusStopInfo(String stopNumber) throws IOException
         {
             URL url = new URL("https://data.smartdublin.ie/cgi-bin/rtpi/busstopinformation?stopid="+stopNumber);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -34,15 +35,11 @@ public class BusAPIController {
                 while((readLine = in.readLine()) != null){
                     response.append(readLine);
                 }
-                ArrayList<BusStop> busStopList;
-                busStopList = BusAPIParser.ParseBusStop(response.toString());
+                Node busStop;
+                busStop = BusAPIParser.ParseBusStop(response.toString());
                 in.close();
-                System.out.println("Success: "+busStopList.get(0).getBusStopID());
-                ArrayList<String> list = busStopList.get(0).getBusRouteList();
-                for(int i=0;i<list.size();i++){
-                    System.out.println("stop: "+list.get(i));
-                }
-                return busStopList;
+                System.out.println("Success: "+busStop.getStopId());
+                return busStop;
             }
             else{
                 return null;
@@ -70,7 +67,7 @@ public class BusAPIController {
             BusRoute busRoute;
             busRoute = BusAPIParser.ParseBusRoute(response.toString());
             in.close();
-            ArrayList<BusStop> list = busRoute.getBusStopList();
+            ArrayList<Node> list = busRoute.getBusStopList();
             for(int i=0;i<list.size();i++){
             }
             return busRoute;

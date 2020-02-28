@@ -9,6 +9,7 @@ import com.WayFinder.Server.Main.Models.FinalRoute;
 import com.WayFinder.Server.Main.NodeCreation.Node;
 import com.WayFinder.Server.Main.NodeCreation.NodeCreationManager;
 import com.WayFinder.Server.Main.NodeMinimisation.NodeMinimisation;
+import com.WayFinder.Server.Main.NodeMinimisation.NodeMinimisationManager;
 import com.WayFinder.Server.Main.Parsers.GoogleDirectionsParser;
 import com.WayFinder.Server.Main.RouteJSONData.RouteJSONData;
 import com.WayFinder.Server.Main.RouteWeightCalculation.RouteWeightCalculationManager;
@@ -66,8 +67,8 @@ public class RestAPIController {
             NodeCreationManager NodeCreationManager=new NodeCreationManager();
             ArrayList<Node> busStopList = NodeCreationManager.getNodes(request.getStartLocation().lat, request.getStartLocation().lng,request.getEndLocation().lat, request.getEndLocation().lng);
 
-            NodeMinimisation nodeMinimisation = new NodeMinimisation();
-            ArrayList<Node> BusStopsNodes = nodeMinimisation.minimiseBusStops(busStopList);
+            NodeMinimisationManager nodeMinimisation = new NodeMinimisationManager();
+            ArrayList<Node> BusStopsNodes = nodeMinimisation.minimiseNodes(busStopList);
 
             System.out.println("Bus stop list size: "+BusStopsNodes.size());
 

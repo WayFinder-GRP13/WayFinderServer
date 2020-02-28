@@ -14,7 +14,7 @@ public class Node {
     private double score;
     private double distanceToStartLocation;
     private double distanceToEndLocation;
-    private ArrayList<String> TransportRoute;
+    private ArrayList<String> TransportRoute = new ArrayList<>();
 
     public Node(String Name,int StopId,int TransportType,double latitude, double longitudue, double score) {
         this.Name=Name;
@@ -34,6 +34,11 @@ public class Node {
         this.score = node.getScore();
         this.distanceToStartLocation=node.getDistanceToStartLocation();
         this.distanceToEndLocation=node.getDistanceToEndLocation();
+    }
+
+    //use setters instead
+    public Node() {
+
     }
 
     public double getLatitude() {
@@ -108,9 +113,16 @@ public class Node {
         return TransportRoute;
     }
 
-    public void setTransportRoute(ArrayList<String> transportRoute) {
-        TransportRoute = transportRoute;
+    public void setTransportRoute(ArrayList<String> TransportRoute) {
+        this.TransportRoute=TransportRoute;
     }
+
+    public void addTransportRouteToList(String transportRoute) {
+        TransportRoute.add(transportRoute);
+    }
+
+
+
 
     @Override
     public int hashCode() {
