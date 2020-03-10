@@ -1,10 +1,8 @@
 package com.WayFinder.Server.Main.Parsers;
 
-import com.WayFinder.Server.Main.Models.FinalRoute;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 
 public class GoogleDirectionsParser {
 
