@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.WayFinder.Server.Main.Models.Luas;
+import com.WayFinder.Server.Main.Models.LuasLine;
 import com.WayFinder.Server.Main.Parsers.LuasAPIParser;
 
 @RestController
@@ -36,9 +36,9 @@ public class LuasAPIController {
                 response.append(readLine);
             }
             in.close();
-            ArrayList<Luas> luasStops = new ArrayList<Luas>();
-            luasStops = LuasAPIParser.Parse(response.toString());
-            return ResponseEntity.ok(luasStops);
+            ArrayList<LuasLine> luasLines = new ArrayList<LuasLine>();
+            luasLines = LuasAPIParser.Parse(response.toString());
+            return ResponseEntity.ok(luasLines);
         }
         else{
             return ResponseEntity.ok("System Error");
