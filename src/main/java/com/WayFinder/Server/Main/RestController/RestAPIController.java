@@ -8,21 +8,32 @@ import com.WayFinder.Server.Main.Helpers.RequestHelper;
 import com.WayFinder.Server.Main.MainServer.MainClass;
 import com.WayFinder.Server.Main.Model.RestAPIRequestInformation;
 import com.WayFinder.Server.Main.Models.FinalRoute;
+import com.WayFinder.Server.Main.Models.LuasLine;
 import com.WayFinder.Server.Main.NodeCreation.Node;
 import com.WayFinder.Server.Main.NodeCreation.NodeCreationManager;
 import com.WayFinder.Server.Main.NodeMinimisation.NodeMinimisation;
 import com.WayFinder.Server.Main.NodeMinimisation.NodeMinimisationManager;
 import com.WayFinder.Server.Main.Parsers.GoogleDirectionsParser;
+import com.WayFinder.Server.Main.Parsers.LuasAPIParser;
 import com.WayFinder.Server.Main.RouteJSONData.RouteJSONData;
 import com.WayFinder.Server.Main.RouteWeightCalculation.RouteWeightCalculationManager;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.xml.sax.SAXException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 @RestController
 public class RestAPIController {
@@ -114,12 +125,58 @@ public class RestAPIController {
         }
 
         // for (FinalRoute obj : result) {
-        //     System.out.println(obj.getOrigin().getStopId());
-        //     System.out.println(obj.getDestination().getStopId());
-        //     System.out.println(obj.getOverviewPolyline());
+        // System.out.println(obj.getOrigin().getStopId());
+        // System.out.println(obj.getDestination().getStopId());
+        // System.out.println(obj.getOverviewPolyline());
         // }
 
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping(value = "/luasroute")
+    public ResponseEntity getLuasRoute(@RequestBody RestAPIRequestInformation request) {
+        ArrayList<FinalRoute> result = new ArrayList<>();
+
+        // bad request check
+        if (!RequestHelper.isValidRequest(request, RequestType.ROUTE)) {
+            return new ResponseEntity<>("Some request parameters are missing", HttpStatus.BAD_REQUEST);
+        }
+
+        // myRestAPIRequestInformation.add(request);
+        ArrayList<LuasLine> luasLines = getLuasData();
+
+        //1. find the nearest luas stops from start and end location
+        //2. store the index in the array of those locations
+        //3. get the stops between start and end locations
+        //4. send to google api and get polyline between each points
+        //5. send to the app
+
+        return ResponseEntity.ok(result);
+    }
+
+    private ArrayList<LuasLine> getLuasData() {
+        try {
+            URL url = new URL("https://luasforecasts.rpa.ie/xml/get.ashx?action=stops&encrypt=false");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Content-Type", "application/xml");
+
+            int responseCode = con.getResponseCode();
+            String readLine = null;
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                StringBuffer response = new StringBuffer();
+                while ((readLine = in.readLine()) != null) {
+                    response.append(readLine);
+                }
+                in.close();
+                return LuasAPIParser.Parse(response.toString());
+            } else {
+                return new ArrayList<LuasLine>();
+            }
+        } catch (Exception e) {
+            return new ArrayList<LuasLine>();
+        }
     }
 
     @PostMapping(value = "/railapi")
