@@ -144,7 +144,11 @@ public class RestAPIController {
 
         // myRestAPIRequestInformation.add(request);
         ArrayList<LuasLine> luasLines = getLuasData();
-
+        //Iterator i = aList.iterator();
+        System.out.println("The ArrayList elements are:");
+        for(int i=0;i<luasLines.size();i++) {
+            System.out.println(luasLines.get(i).LineName+"\n");
+        }
         //1. find the nearest luas stops from start and end location
         //2. store the index in the array of those locations
         //3. get the stops between start and end locations
