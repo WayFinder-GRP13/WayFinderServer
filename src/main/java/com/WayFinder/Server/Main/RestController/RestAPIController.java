@@ -7,8 +7,10 @@ import com.WayFinder.Server.Main.HTTPRequest.HTTPRequest;
 import com.WayFinder.Server.Main.Helpers.RequestHelper;
 import com.WayFinder.Server.Main.MainServer.MainClass;
 import com.WayFinder.Server.Main.Model.RestAPIRequestInformation;
-import com.WayFinder.Server.Main.Models.FinalRoute;
-import com.WayFinder.Server.Main.Models.LuasLine;
+import com.WayFinder.Server.Main.Models.*;
+
+import java.util.Comparator;
+
 import com.WayFinder.Server.Main.NodeCreation.Node;
 import com.WayFinder.Server.Main.NodeCreation.NodeCreationManager;
 import com.WayFinder.Server.Main.NodeMinimisation.NodeMinimisation;
@@ -28,9 +30,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,6 +44,21 @@ public class RestAPIController {
     public RestAPIController() {
         // note not sure which one to do
 
+    }
+    public double getDistance(double lat1,double lon1,double lat2,double lon2, String unit) {
+        //
+//        return Math.acos(Math.sin(StartLat*(180/Math.PI)) * Math.sin(StartLat) +
+//                Math.cos(StartLat*(180/Math.PI)) * Math.cos(EndLng*(180/Math.PI)) *
+//                        Math.cos(StartLng*(180/Math.PI) - EndLat*(180/Math.PI))) * radius;
+        double theta = lon1 - lon2;
+        double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
+        dist = Math.acos(dist);
+        dist = Math.toDegrees(dist);
+        dist = dist * 60 * 1.1515;
+        if (unit.equals("K")) {
+            dist = dist * 1.609344;
+        }
+        return dist;
     }
 
     @GetMapping(value = "/health/iamalive")
@@ -144,16 +159,113 @@ public class RestAPIController {
 
         // myRestAPIRequestInformation.add(request);
         ArrayList<LuasLine> luasLines = getLuasData();
-        //Iterator i = aList.iterator();
-        System.out.println("The ArrayList elements are:");
-        for(int i=0;i<luasLines.size();i++) {
-            System.out.println(luasLines.get(i).LineName+"\n");
+        ArrayList<LuasStop> redLineStopList=new ArrayList<LuasStop>();
+        ArrayList<LuasStop> greenLineStopList=new ArrayList<LuasStop>();
+        ArrayList<LuasInfo> nearestRedLineStartPointInfo=new ArrayList<LuasInfo>();
+        ArrayList<LuasInfo> nearestRedLineEndPointInfo=new ArrayList<LuasInfo>();
+        ArrayList<LuasInfo> nearestGreenLineStartPointInfo=new ArrayList<LuasInfo>();
+        ArrayList<LuasInfo> nearestGreenLineEndPointInfo=new ArrayList<LuasInfo>();
+        //list for storing optimum luas line coordinates
+        ArrayList<Position> luasCoordinates = new ArrayList<Position>();
+        //Adding luas stops separately to red and green
+        redLineStopList.addAll(luasLines.get(0).Stops);
+        greenLineStopList.addAll(luasLines.get(1).Stops);
+
+        System.out.println("Size of Red luas Lines"+redLineStopList.size());
+        //Find nearest stop from start location for red luas line
+        for(int i=0;i<redLineStopList.size();i++){
+            LuasInfo info=new LuasInfo();
+            info.distance=getDistance(request.getStartLocation().lat,request.getStartLocation().lng,
+                    redLineStopList.get(i).Latitude,redLineStopList.get(i).Longitude,"K");
+              info.IndexInfo=i;
+              info.LuasLine="Red";
+            nearestRedLineStartPointInfo.add(info);
+        }
+        Collections.sort(nearestRedLineStartPointInfo, Comparator.comparingDouble(LuasInfo::getDistance));
+        //Find nearest stop from end location for red luas line
+        for(int i=0;i<redLineStopList.size();i++){
+            LuasInfo info=new LuasInfo();
+            info.distance=getDistance(request.getEndLocation().lat,request.getEndLocation().lng,
+                    redLineStopList.get(i).Latitude,redLineStopList.get(i).Longitude,"K");
+            info.IndexInfo=i;
+            info.LuasLine="Red";
+            nearestRedLineEndPointInfo.add(info);
+        }
+        Collections.sort(nearestRedLineEndPointInfo, Comparator.comparingDouble(LuasInfo::getDistance));
+        //Find nearest stop from start location for Green luas line
+        for(int i=0;i<greenLineStopList.size();i++){
+            LuasInfo info=new LuasInfo();
+            info.distance=getDistance(request.getStartLocation().lat,request.getStartLocation().lng,
+                    greenLineStopList.get(i).Latitude,greenLineStopList.get(i).Longitude,"K");
+            info.IndexInfo=i;
+            info.LuasLine="Green";
+            nearestGreenLineStartPointInfo.add(info);
+        }
+        Collections.sort(nearestGreenLineStartPointInfo, Comparator.comparingDouble(LuasInfo::getDistance));
+        //Find nearest stop from end location for Green luas line
+        for(int i=0;i<greenLineStopList.size();i++){
+            LuasInfo info=new LuasInfo();
+           info.distance=getDistance(request.getEndLocation().lat,request.getEndLocation().lng,
+                    greenLineStopList.get(i).Latitude,greenLineStopList.get(i).Longitude,"K");
+            info.IndexInfo=i;
+            info.LuasLine="Green";
+            nearestGreenLineEndPointInfo.add(info);
+        }
+        Collections.sort(nearestGreenLineEndPointInfo, Comparator.comparingDouble(LuasInfo::getDistance));
+        //Find the index of the start and end stops in redLineStopList and get the stops between them
+         System.out.println("RED LUAS LINE");
+        int redLineStartingIndex=nearestRedLineStartPointInfo.get(0).IndexInfo;
+        String redLineStartLuasStop=redLineStopList.get(redLineStartingIndex).Pronunciation;
+        System.out.println("Starting Index and Stop: "+redLineStartingIndex +" " +redLineStartLuasStop);
+        int redLineEndingIndex=nearestRedLineEndPointInfo.get(0).IndexInfo;
+        String redLineEndLuasStop=redLineStopList.get(redLineEndingIndex).Pronunciation;
+        System.out.println("Ending Index and Stop: "+redLineEndingIndex +" " +redLineEndLuasStop);
+        for (int i=redLineStartingIndex;i<=redLineEndingIndex;i++){
+            System.out.println(redLineStopList.get(i).Pronunciation);
+        }
+        //Find the index of the start and end stops in greenLineStopList and get the stops between them
+        System.out.println("GREEN LUAS LINE");
+        int greenLineStartingIndex=nearestGreenLineStartPointInfo.get(0).IndexInfo;
+        String greenLineStartLuasStop=greenLineStopList.get(greenLineStartingIndex).Pronunciation;
+        System.out.println("Starting Index and Stop: "+greenLineStartingIndex +" " +greenLineStartLuasStop);
+        int greenLineEndingIndex=nearestGreenLineEndPointInfo.get(0).IndexInfo;
+        String greenLineEndLuasStop=greenLineStopList.get(greenLineEndingIndex).Pronunciation;
+        System.out.println("Ending Index and Stop: "+greenLineEndingIndex +" " +greenLineEndLuasStop);
+        for (int i=greenLineStartingIndex;i<=greenLineEndingIndex;i++){
+            System.out.println(greenLineStopList.get(i).Pronunciation);
+        }
+        //Find the shortest distant luas stop from start location to both the luas lines
+        System.out.println("OPTIMAL LUAS ROUTE");
+        if(nearestRedLineStartPointInfo.get(0).distance < nearestGreenLineStartPointInfo.get(0).distance){
+            for (int i=redLineStartingIndex;i<=redLineEndingIndex;i++){
+                Position coordinatesInfo=new Position();
+                coordinatesInfo.Latitude=redLineStopList.get(i).Latitude;
+                coordinatesInfo.Longitude=redLineStopList.get(i).Longitude;
+                System.out.println(redLineStopList.get(i).Pronunciation);
+                luasCoordinates.add(coordinatesInfo);
+            }
+        }
+        else{
+            for (int i=greenLineStartingIndex;i<=greenLineEndingIndex;i++){
+                Position coordinatesInfo=new Position();
+                coordinatesInfo.Latitude=redLineStopList.get(i).Latitude;
+                coordinatesInfo.Longitude=redLineStopList.get(i).Longitude;
+                System.out.println(greenLineStopList.get(i).Pronunciation);
+                luasCoordinates.add(coordinatesInfo);
+            }
+        }
+        //The coordinates for luas stops along the optimal path
+        System.out.println("Luas Coordinates: ");
+        for (int i=0;i<luasCoordinates.size();i++) {
+            System.out.println("Lattitude: " + luasCoordinates.get(i).Latitude);
+            System.out.println("Longitude: " + luasCoordinates.get(i).Longitude);
         }
         //1. find the nearest luas stops from start and end location
         //2. store the index in the array of those locations
         //3. get the stops between start and end locations
         //4. send to google api and get polyline between each points
         //5. send to the app
+
 
         return ResponseEntity.ok(result);
     }
