@@ -1,20 +1,24 @@
 package com.WayFinder.Server.Main.RouteJSONData;
-
-import com.WayFinder.Server.Main.Constants.RouteTypes;
 import com.WayFinder.Server.Main.DijkstraAlgorithm.Edge;
-import com.WayFinder.Server.Main.Models.Position;
 import com.WayFinder.Server.Main.NodeCreation.Node;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class RouteJSONData {
 
     private String directionApiUrl = "https://maps.googleapis.com/maps/api/directions/json?";
     private String apiKey = "AIzaSyCqCdlPmegML3DEtc7BL9X1RFVsm8lEBbE";
+    HashMap<Integer,String> routeTypes = new HashMap<>();
 
     public ArrayList<String> getJSONpath(LinkedList<Node> pathList, ArrayList<Edge> edgeList) {
         ArrayList<String> googleRequests = new ArrayList<>();
+        routeTypes.put(0,"walking");
+        routeTypes.put(1,"transit");//bus
+        routeTypes.put(2,"transit");//train
+        routeTypes.put(3,"bicycling");
+        routeTypes.put(4,"driving");//driving
 
         for (int i = 0; i < pathList.size() - 1; i++) {
             StringBuilder apiRequest = new StringBuilder();
@@ -63,6 +67,16 @@ public class RouteJSONData {
         String googleRequests = apiRequest.toString();
 
         return googleRequests;
+    }
+
+    private int getTransitType(ArrayList<Edge> edgeList,Node origin,Node destination){
+        int transportType=0;
+        for (Edge edge:edgeList){
+            if(edge.getSource()==origin&&edge.getDestination()==destination){
+                transportType=edge.getTransportType();
+            }
+        }
+        return transportType;
     }
 
     // private int getTransitType(ArrayList<Edge> edgeList,Node origin,Node

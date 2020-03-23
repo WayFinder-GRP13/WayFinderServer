@@ -99,7 +99,7 @@ public class RestAPIController {
         return ResponseEntity.ok(itemToReturn);
     }
 
-    @PostMapping(value = "/route")
+    @PostMapping(value = "/")
     public ResponseEntity getRoute(@RequestBody RestAPIRequestInformation request) {
         ArrayList<FinalRoute> result = new ArrayList<>();
 
@@ -310,6 +310,8 @@ public class RestAPIController {
             // System.out.println(response);
             String polyLine = googleDirectionsParser.ParseBusStop(response);
 
+            origin.setStopId("55");
+            destination.setStopId("55");
             FinalRoute finalRoutePoint = new FinalRoute(origin, destination, polyLine,2);
             result.add(finalRoutePoint);
         }
