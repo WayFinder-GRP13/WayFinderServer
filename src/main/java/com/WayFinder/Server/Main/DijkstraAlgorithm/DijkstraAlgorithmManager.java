@@ -24,7 +24,7 @@ public class DijkstraAlgorithmManager {
         for (Node node : path) {
             System.out.println(node.getStopId());
         }
-
+        System.out.println("Dijestras algo final list size:"+path.size());
         return path;
 
     }

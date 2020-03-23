@@ -13,9 +13,11 @@ import com.WayFinder.Server.Main.NodeMinimisation.NodeMinimisationManager;
 import com.WayFinder.Server.Main.Parsers.GoogleDirectionsParser;
 import com.WayFinder.Server.Main.RouteJSONData.RouteJSONData;
 import com.WayFinder.Server.Main.RouteWeightCalculation.RouteWeightCalculationManager;
+import com.google.maps.model.LatLng;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -68,7 +70,7 @@ public class RestAPIController {
             ArrayList<Node> busStopList = NodeCreationManager.getNodes(request.getStartLocation().lat, request.getStartLocation().lng,request.getEndLocation().lat, request.getEndLocation().lng);
 
             NodeMinimisationManager nodeMinimisation = new NodeMinimisationManager();
-            ArrayList<Node> BusStopsNodes = nodeMinimisation.minimiseNodes(busStopList);
+            ArrayList<Node> BusStopsNodes = nodeMinimisation.minimiseNodes(busStopList, new LatLng(request.getStartLocation().lat, request.getStartLocation().lng),new LatLng(request.getEndLocation().lat, request.getEndLocation().lng));
 
             System.out.println("Bus stop list size: "+BusStopsNodes.size());
 
@@ -79,25 +81,41 @@ public class RestAPIController {
             DijkstraAlgorithmManager runNodeGraph = new DijkstraAlgorithmManager();
             LinkedList<Node> finalPath = runNodeGraph.ExecuteAlgorithm(BusStopsNodes,edgeList);
 
+
+            //add users start and finish location to the list
+            // first position
+            finalPath.add(0,new Node("StartLocation",0,0,request.getStartLocation().lat,request.getStartLocation().lng,99.9));
+            edgeList.add(0,new Edge("start",finalPath.get(0),finalPath.get(1),0,0));
+            // end location
+            finalPath.add(new Node("EndLocation",99999,0,request.getEndLocation().lat,request.getEndLocation().lng,99.9));
+            edgeList.add(new Edge("end",finalPath.get(finalPath.size()-2),finalPath.get(finalPath.size()-1),0,0));
+
             for (Node node : finalPath) {
-                System.out.println(node.getStopId());
+                System.out.println("Final Path:"+node.getStopId());
             }
 
             RouteJSONData routeJSONData = new RouteJSONData();
             ArrayList<String> apiRequest = routeJSONData.getJSONpath(finalPath,edgeList);
+
+            for (String requestAPI : apiRequest) {
+                System.out.println("API Request:"+requestAPI);
+            }
 
             HTTPRequest httpRequest = new HTTPRequest();
             GoogleDirectionsParser googleDirectionsParser= new GoogleDirectionsParser();
 
 
             int index = 0;
-            for (String APIRequest : apiRequest) {
+            for (int i=0;i<apiRequest.size();i++) {
+                String APIRequest = apiRequest.get(i);
+                int transportType = edgeList.get(i).getTransportType();
+
                 System.out.println(request);
                 String response = httpRequest.sendHTTPRequest(APIRequest);
                 //System.out.println(response);
                 String polyLine = googleDirectionsParser.ParseBusStop(response);
 
-                FinalRoute finalRoutePoint = new FinalRoute(finalPath.get(index),finalPath.get(index+1),polyLine);
+                FinalRoute finalRoutePoint = new FinalRoute(finalPath.get(index),finalPath.get(index+1),polyLine,transportType);
                 result.add(finalRoutePoint);
                 index+=1;
             }
@@ -106,6 +124,7 @@ public class RestAPIController {
                 System.out.println(obj.getOrigin().getStopId());
                 System.out.println(obj.getDestination().getStopId());
                 System.out.println(obj.getOverviewPolyline());
+                System.out.println("Route type: "+obj.getRouteType());
             }
 
         }

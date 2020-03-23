@@ -7,6 +7,7 @@ import com.WayFinder.Server.Main.RouteWeightCalculation.Bus.BusWeightCalculation
 import java.util.ArrayList;
 
 public class RouteWeightCalculationManager {
+    static int walkWeight=6;
     private BusWeightCalculation busWeightCalculation=new BusWeightCalculation();
 
 
@@ -55,7 +56,7 @@ public class RouteWeightCalculationManager {
                 if(secondNode.getTransportType()==1){
                     // walk
                     // bus
-                    int walkWeight = 2;
+                    walkWeight -=1;
                     int busWeight = busWeightCalculation.getNodeWeight(firstNode,secondNode);
                     //if bus weight largest use bus weight for edge
                     if(busWeight>walkWeight){
@@ -64,7 +65,7 @@ public class RouteWeightCalculationManager {
 
                     }else //if walk weight largest use walk weight for edge
                         if(walkWeight>busWeight){
-                        edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,walkWeight,4));
+                        edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,walkWeight,0));
                     }//if weights tie then default is bus weight for edge
                         else{
                         edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,busWeight,1));

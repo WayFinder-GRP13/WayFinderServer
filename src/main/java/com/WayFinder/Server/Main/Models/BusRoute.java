@@ -23,4 +23,8 @@ public class BusRoute {
     public void addBusStop(Node busStop) {
         busStopList.add(busStop);
     }
+
+    public void setBusStopList(ArrayList<Node> filteredStopList) {
+        this.busStopList=filteredStopList;
+    }
 }

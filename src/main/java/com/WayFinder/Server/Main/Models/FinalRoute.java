@@ -6,11 +6,13 @@ public class FinalRoute{
     private Node Origin;
     private Node Destination;
     private String OverviewPolyline;
+    private int RouteType;
 
-    public FinalRoute(Node origin, Node destination, String overviewPolyline) {
+    public FinalRoute(Node origin, Node destination, String overviewPolyline,int RouteType) {
         Origin = origin;
         Destination = destination;
         OverviewPolyline = overviewPolyline;
+        this.RouteType=RouteType;
     }
 
     public String getOverviewPolyline() {
@@ -35,5 +37,13 @@ public class FinalRoute{
 
     public void setDestination(Node destination) {
         Destination = destination;
+    }
+
+    public int getRouteType() {
+        return RouteType;
+    }
+
+    public void setRouteType(int routeType) {
+        RouteType = routeType;
     }
 }

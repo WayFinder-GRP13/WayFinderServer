@@ -30,6 +30,7 @@ public class MainApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MainApplication.class, args);
+
 		//test code
 //		NodeCreationManager NodeCreationManager=new NodeCreationManager();
 //		ArrayList<Node> busStopList = NodeCreationManager.getNodes(53.364084, -6.280115,53.349355, -6.208735);

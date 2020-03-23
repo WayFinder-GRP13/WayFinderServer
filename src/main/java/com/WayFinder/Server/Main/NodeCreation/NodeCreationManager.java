@@ -17,10 +17,6 @@ public class NodeCreationManager {
     }
 
     public double distanceTo(double lat1,double lon1,double lat2,double lon2, String unit) {
-//
-//        return Math.acos(Math.sin(StartLat*(180/Math.PI)) * Math.sin(StartLat) +
-//                Math.cos(StartLat*(180/Math.PI)) * Math.cos(EndLng*(180/Math.PI)) *
-//                        Math.cos(StartLng*(180/Math.PI) - EndLat*(180/Math.PI))) * radius;
         double theta = lon1 - lon2;
         double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
         dist = Math.acos(dist);
@@ -42,12 +38,12 @@ public class NodeCreationManager {
 
     }
     public ArrayList<Node>  getNodes(double StartLat,double StartLng,double EndLat,double EndLng){//53.35, -6, 53.36, -6.4
-        double ThresholdDistance=.2; // this is in Km
+        double ThresholdDistance=0.3; // this is in Km
         double StartLatCOORD=StartLat;
         double EndLatCOORD=EndLat;
         double StartLngCOORD=StartLng;
         double EndLngCOORD=EndLng;
-        double distanceScale = 6.0;
+        double distanceScale = 5.0;
         System.out.println("Distance is: "+distanceTo(StartLat, StartLng,EndLat, EndLng, "K"));
 
         double distance = distanceTo(StartLat, StartLng,EndLat, EndLng, "K");
@@ -55,33 +51,33 @@ public class NodeCreationManager {
         double angle = getAngle(StartLat,StartLng,EndLat,EndLng);
 
         // careful if altering this code: in western hemisphere minus latitude is right and plus latitude is left
-        // top quadrant
-        if (angle>=45.0&&angle<=135.0){
-            StartLatCOORD = StartLat - ((distance / distanceScale) / (110.574));//.----->
-            EndLatCOORD = EndLat + ((distance / distanceScale) / (110.574));//<------.
+        // right upper quadrant//distance / distanceScale
+        if (0.0<=angle&&angle<=90.0){
+            StartLatCOORD = StartLat - ((ThresholdDistance) / (110.574));//.----->
+            EndLatCOORD = EndLat + ((ThresholdDistance) / (110.574));//<------. # note plus becuae minus latt is increasing direction
             StartLngCOORD = StartLng - (ThresholdDistance ) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));//down
             EndLngCOORD = EndLng + (ThresholdDistance ) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));//^
         }
-        // left quadrant
-        else if(angle>=135.0&&angle<=-135.0){
+        // left upper quadrant
+        else if(90.0<=angle&&angle<=180.0){
             StartLatCOORD = StartLat - ((ThresholdDistance ) / (110.574));
             EndLatCOORD = EndLat + ((ThresholdDistance ) / (110.574));
-            StartLngCOORD = StartLng - (distance / distanceScale) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));
-            EndLngCOORD = EndLng + (distance / distanceScale) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));
+            StartLngCOORD = StartLng + (ThresholdDistance) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));
+            EndLngCOORD = EndLng - (ThresholdDistance) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));
         }
-        //bottom quadrant
-        else if(angle>=-135.0&&angle<=-45.0){
-            StartLatCOORD = StartLat + ((distance / distanceScale) / (110.574));
-            EndLatCOORD = EndLat - ((distance / distanceScale) / (110.574));
+        //left bottom quadrant
+        else if(-180.0<=angle&&angle<=-90.0){
+            StartLatCOORD = StartLat + ((ThresholdDistance) / (110.574));
+            EndLatCOORD = EndLat - ((ThresholdDistance) / (110.574));
             StartLngCOORD = StartLng + (ThresholdDistance ) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));
             EndLngCOORD = EndLng - (ThresholdDistance) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));
         }
-        // right quadrant
-        else if(angle>=-45.0&&angle<=45.0){
+        // right bottom quadrant
+        else if(-90.0<=angle&&angle<=0.0){
             StartLatCOORD = StartLat + ((ThresholdDistance ) / (110.574));
             EndLatCOORD = EndLat - ((ThresholdDistance) / (110.574));
-            StartLngCOORD = StartLng + (distance / distanceScale)/(111.320*Math.cos(Math.toRadians(StartLatCOORD)));
-            EndLngCOORD = EndLng - (distance / distanceScale) / (111.320 * Math.cos(Math.toRadians(EndLatCOORD)));
+            StartLngCOORD = StartLng - (ThresholdDistance)/(111.320*Math.cos(Math.toRadians(StartLatCOORD)));
+            EndLngCOORD = EndLng + (ThresholdDistance) / (111.320 * Math.cos(Math.toRadians(EndLatCOORD)));
         }
         System.out.println("Angle is: "+angle);
         System.out.println("This is the old position for the bounding box: lat: "+StartLat+","+StartLng);
@@ -177,13 +173,10 @@ public class NodeCreationManager {
             int counter=0;
             while (rs2.next()) {
                 for (int i = 1; i <= columnsNumber; i++) {
-                    if (i > 1) System.out.print(",  ");
                     String columnValue = rs2.getString(i);
-                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
                 }
                 Node currentStop = BusNodeList.get(counter);
                 currentStop.setDistanceToStartLocation(rs2.getDouble(1));
-                System.out.println("");
                 counter=counter+1;
             }
         } catch (SQLException ex) {
@@ -205,9 +198,7 @@ public class NodeCreationManager {
             int counter=0;
             while (rs3.next()) {
                 for (int i = 1; i <= columnsNumber; i++) {
-                    if (i > 1) System.out.print(",  ");
                     String columnValue = rs3.getString(i);
-                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
                 }
                 Node currentStop = BusNodeList.get(counter);
                 currentStop.setDistanceToEndLocation(rs3.getDouble(1));
@@ -222,8 +213,9 @@ public class NodeCreationManager {
             lgr.log(Level.SEVERE, ex.getMessage(), ex);
         }
         for(Node node:BusNodeList) {
-            System.out.println("here:"+node.getDistanceToStartLocation());
-            System.out.println("here1:"+node.getDistanceToEndLocation());
+            System.out.println("Bus Stop Number: "+node.getStopId());
+            System.out.println("Distnace to start loaction: "+node.getDistanceToStartLocation());
+            System.out.println("Distance to end location: "+node.getDistanceToEndLocation());
         }
         return BusNodeList;
     }

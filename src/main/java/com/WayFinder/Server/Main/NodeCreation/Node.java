@@ -11,6 +11,7 @@ public class Node {
     private int TransportType;
     private double latitude;
     private double longitudue;
+    private String direction;
     private double score;
     private double distanceToStartLocation;
     private double distanceToEndLocation;

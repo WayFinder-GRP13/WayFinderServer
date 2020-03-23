@@ -24,9 +24,28 @@ public class RouteJSONData {
             Node origin = pathList.get(i);
             Node destination = pathList.get(i+1);
 
+            //if first node
+            if(i==0){
+                apiRequest.append("origin="+origin.getLatitude()+","+origin.getLongitudue()+"&");
+                apiRequest.append("destination="+destination.getLatitude()+","+destination.getLongitudue()+"&");
+                apiRequest.append("mode=walking");
+                apiRequest.append("&key=AIzaSyCqCdlPmegML3DEtc7BL9X1RFVsm8lEBbE");
+                googleRequests.add(apiRequest.toString());
+                continue;
+            }
+            // if last node
+            if(i==pathList.size()-2){
+                apiRequest.append("origin="+origin.getLatitude()+","+origin.getLongitudue()+"&");
+                apiRequest.append("destination="+destination.getLatitude()+","+destination.getLongitudue()+"&");
+                apiRequest.append("mode=walking");
+                apiRequest.append("&key=AIzaSyCqCdlPmegML3DEtc7BL9X1RFVsm8lEBbE");
+                googleRequests.add(apiRequest.toString());
+                continue;
+            }
+
             apiRequest.append("origin="+origin.getLatitude()+","+origin.getLongitudue()+"&");
             apiRequest.append("destination="+destination.getLatitude()+","+destination.getLongitudue()+"&");
-            apiRequest.append("mode=driving");//+routeTypes.get(getTransitType(edgeList,origin,destination)));
+            apiRequest.append("mode="+routeTypes.get(getTransitType(edgeList,origin,destination)));
             apiRequest.append("&key=AIzaSyCqCdlPmegML3DEtc7BL9X1RFVsm8lEBbE");
 
             googleRequests.add(apiRequest.toString());
