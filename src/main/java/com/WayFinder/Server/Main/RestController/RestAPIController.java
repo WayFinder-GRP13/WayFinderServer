@@ -13,10 +13,10 @@ import java.util.Comparator;
 
 import com.WayFinder.Server.Main.NodeCreation.Node;
 import com.WayFinder.Server.Main.NodeCreation.NodeCreationManager;
-import com.WayFinder.Server.Main.NodeMinimisation.NodeMinimisation;
 import com.WayFinder.Server.Main.NodeMinimisation.NodeMinimisationManager;
 import com.WayFinder.Server.Main.Parsers.GoogleDirectionsParser;
 import com.WayFinder.Server.Main.Parsers.LuasAPIParser;
+import com.WayFinder.Server.Main.Parsers.RouteResponse;
 import com.WayFinder.Server.Main.RouteJSONData.RouteJSONData;
 import com.WayFinder.Server.Main.RouteWeightCalculation.RouteWeightCalculationManager;
 import com.google.maps.model.LatLng;
@@ -28,19 +28,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 @RestController
 public class RestAPIController {
@@ -149,20 +142,53 @@ public class RestAPIController {
         HTTPRequest httpRequest = new HTTPRequest();
         GoogleDirectionsParser googleDirectionsParser= new GoogleDirectionsParser();
 
-
+        long currentLegTime = System.currentTimeMillis() / 1000;
         int index = 0;
+        String busRoute = null;
+
         for (int i=0;i<apiRequest.size();i++) {
             String APIRequest = apiRequest.get(i);
             int transportType = edgeList.get(i).getTransportType();
 
-            System.out.println(request);
-            String response = httpRequest.sendHTTPRequest(APIRequest);
+            System.out.println(APIRequest+"&departure_time="+currentLegTime);
+            String response = httpRequest.sendHTTPRequest(APIRequest+"&departure_time="+currentLegTime);
             //System.out.println(response);
-            String polyLine = googleDirectionsParser.ParseBusStop(response);
+            RouteResponse routeResponse = null;
+            //walking
+            if(APIRequest.contains("mode=walking")) {
+                 routeResponse = googleDirectionsParser.ParseWalking(response);
+                FinalRoute finalRoutePoint = new FinalRoute(finalPath.get(index),finalPath.get(index+1),routeResponse.getOverviewPolyline(),transportType,routeResponse.getLength(),routeResponse.getRoute(),"now");
 
-            FinalRoute finalRoutePoint = new FinalRoute(finalPath.get(index),finalPath.get(index+1),polyLine,transportType);
+                if(busRoute==null){
+                    busRoute = finalRoutePoint.getRouteNumber();
+                }else{
+                    finalRoutePoint.setRouteNumber(busRoute);
+                }
+
+                result.add(finalRoutePoint);
+                //adds the length of the leg to current time for next api call
+                currentLegTime+=finalRoutePoint.getLengthMinutes();
+                index+=1;
+                continue;
+            }
+            //bus train
+            if(APIRequest.contains("mode=transit")){
+                routeResponse = googleDirectionsParser.ParseBusStop(response);
+                FinalRoute finalRoutePoint = new FinalRoute(finalPath.get(index),finalPath.get(index+1),routeResponse.getOverviewPolyline(),transportType,routeResponse.getLength(),routeResponse.getRoute(),routeResponse.getDepartureTime());
+                result.add(finalRoutePoint);
+                currentLegTime+=finalRoutePoint.getLengthMinutes();
+                index+=1;
+                continue;
+            }
+            //cycling
+            if(APIRequest.contains("mode=cycling")){
+
+            }
+
+            // if null get here
+            FinalRoute finalRoutePoint = new FinalRoute(finalPath.get(index),finalPath.get(index+1),routeResponse.getOverviewPolyline(),transportType,routeResponse.getLength(), routeResponse.getRoute(),"now");
             result.add(finalRoutePoint);
-            index+=1;
+
         }
 
         for(FinalRoute obj : result){
@@ -170,6 +196,7 @@ public class RestAPIController {
             System.out.println(obj.getDestination().getStopId());
             System.out.println(obj.getOverviewPolyline());
             System.out.println("Route type: "+obj.getRouteType());
+            System.out.println("Route length: "+obj.getLengthMinutes());
         }
 
 
@@ -308,11 +335,11 @@ public class RestAPIController {
             String apiRequest = routeJSONData.getJSONpath(origin, destination, "transit");
             String response = httpRequest.sendHTTPRequest(apiRequest);
             // System.out.println(response);
-            String polyLine = googleDirectionsParser.ParseBusStop(response);
+            String polyLine = googleDirectionsParser.ParseLuasStop(response);
 
             origin.setStopId("55");
             destination.setStopId("55");
-            FinalRoute finalRoutePoint = new FinalRoute(origin, destination, polyLine,2);
+            FinalRoute finalRoutePoint = new FinalRoute(origin, destination, polyLine,2,5, "luas","now");
             result.add(finalRoutePoint);
         }
 
