@@ -131,12 +131,12 @@ public class RestAPIController {
         for (Node node : finalPath) {
             System.out.println("Final Path:"+node.getStopId());
         }
-
+        
         RouteJSONData routeJSONData = new RouteJSONData();
         ArrayList<String> apiRequest = routeJSONData.getJSONpath(finalPath,edgeList);
 
         for (String requestAPI : apiRequest) {
-            System.out.println("API Request:"+requestAPI);
+            //System.out.println("API Request:"+requestAPI);
         }
 
         HTTPRequest httpRequest = new HTTPRequest();
@@ -148,22 +148,18 @@ public class RestAPIController {
 
         for (int i=0;i<apiRequest.size();i++) {
             String APIRequest = apiRequest.get(i);
-            int transportType = edgeList.get(i).getTransportType();
+            int transportType = routeJSONData.ParseAPIRequest(APIRequest);
 
-            System.out.println(APIRequest+"&departure_time="+currentLegTime);
+            System.out.println(APIRequest);
+            APIRequest=APIRequest.replace("&mode=","&departure_time="+currentLegTime+"&mode=");
+            System.out.println(APIRequest);
             String response = httpRequest.sendHTTPRequest(APIRequest+"&departure_time="+currentLegTime);
             //System.out.println(response);
             RouteResponse routeResponse = null;
             //walking
             if(APIRequest.contains("mode=walking")) {
                  routeResponse = googleDirectionsParser.ParseWalking(response);
-                FinalRoute finalRoutePoint = new FinalRoute(finalPath.get(index),finalPath.get(index+1),routeResponse.getOverviewPolyline(),transportType,routeResponse.getLength(),routeResponse.getRoute(),"now");
-
-                if(busRoute==null){
-                    busRoute = finalRoutePoint.getRouteNumber();
-                }else{
-                    finalRoutePoint.setRouteNumber(busRoute);
-                }
+                FinalRoute finalRoutePoint = new FinalRoute(routeJSONData.getNodeFromString(APIRequest,finalPath,"ogn"),routeJSONData.getNodeFromString(APIRequest,finalPath,"dst"),routeResponse.getOverviewPolyline(),transportType,routeResponse.getLength(),routeResponse.getRoute(),"now");
 
                 result.add(finalRoutePoint);
                 //adds the length of the leg to current time for next api call
@@ -174,7 +170,12 @@ public class RestAPIController {
             //bus train
             if(APIRequest.contains("mode=transit")){
                 routeResponse = googleDirectionsParser.ParseBusStop(response);
-                FinalRoute finalRoutePoint = new FinalRoute(finalPath.get(index),finalPath.get(index+1),routeResponse.getOverviewPolyline(),transportType,routeResponse.getLength(),routeResponse.getRoute(),routeResponse.getDepartureTime());
+                FinalRoute finalRoutePoint = new FinalRoute(routeJSONData.getNodeFromString(APIRequest,finalPath,"ogn"),routeJSONData.getNodeFromString(APIRequest,finalPath,"dst"),routeResponse.getOverviewPolyline(),transportType,routeResponse.getLength(),routeResponse.getRoute(),routeResponse.getDepartureTime());
+                if(busRoute==null){
+                    busRoute = finalRoutePoint.getRouteNumber();
+                }else{
+                    finalRoutePoint.setRouteNumber(busRoute);
+                }
                 result.add(finalRoutePoint);
                 currentLegTime+=finalRoutePoint.getLengthMinutes();
                 index+=1;
@@ -186,7 +187,7 @@ public class RestAPIController {
             }
 
             // if null get here
-            FinalRoute finalRoutePoint = new FinalRoute(finalPath.get(index),finalPath.get(index+1),routeResponse.getOverviewPolyline(),transportType,routeResponse.getLength(), routeResponse.getRoute(),"now");
+            FinalRoute finalRoutePoint = new FinalRoute(routeJSONData.getNodeFromString(APIRequest,finalPath,"ogn"),routeJSONData.getNodeFromString(APIRequest,finalPath,"dst"),routeResponse.getOverviewPolyline(),transportType,routeResponse.getLength(), routeResponse.getRoute(),"now");
             result.add(finalRoutePoint);
 
         }

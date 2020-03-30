@@ -1,6 +1,7 @@
 package com.WayFinder.Server.Main.Parsers;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -20,7 +21,13 @@ public class GoogleDirectionsParser {
             int tripDuration = tripDurationJSON.getInt("value");
             System.out.println("output of trip Duration is: " + tripDuration);
             JSONArray steps = legs.getJSONObject(0).getJSONArray("steps");
-            JSONObject transitDetails = steps.getJSONObject(0).getJSONObject("transit_details");
+            JSONObject transitDetails = null;
+            // check if this part was walking or bus
+            try {
+                transitDetails = steps.getJSONObject(0).getJSONObject("transit_details");
+            }catch(JSONException e){
+                transitDetails = steps.getJSONObject(1).getJSONObject("transit_details");
+            }
             JSONObject line = transitDetails.getJSONObject("line");
             String busRoute = line.getString("short_name");
             System.out.println("output of busNumber is: " + busRoute);
