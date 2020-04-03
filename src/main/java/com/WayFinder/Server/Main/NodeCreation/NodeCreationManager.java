@@ -10,10 +10,12 @@ import java.util.logging.Logger;
 
 public class NodeCreationManager {
     private ArrayList<Node> BusNodeList;
+    private ArrayList<Node> LuasNodeList;
 
     //pg:killall --app group13aseserver= to clear all connections
     public NodeCreationManager(){
         BusNodeList = new ArrayList();
+        LuasNodeList = new ArrayList();
     }
 
     public double distanceTo(double lat1,double lon1,double lat2,double lon2, String unit) {
@@ -37,70 +39,84 @@ public class NodeCreationManager {
         return angle;
 
     }
-    public ArrayList<Node>  getNodes(double StartLat,double StartLng,double EndLat,double EndLng){//53.35, -6, 53.36, -6.4
-        double ThresholdDistance=0.3; // this is in Km
-        double StartLatCOORD=StartLat;
-        double EndLatCOORD=EndLat;
-        double StartLngCOORD=StartLng;
-        double EndLngCOORD=EndLng;
+    public ArrayList<Node>  getNodes(double StartLat,double StartLng,double EndLat,double EndLng, boolean isLuas) {
+        double ThresholdDistance = 0.3; // this is in Km
+        double StartLatCOORD = StartLat;
+        double EndLatCOORD = EndLat;
+        double StartLngCOORD = StartLng;
+        double EndLngCOORD = EndLng;
         double distanceScale = 5.0;
-        System.out.println("Distance is: "+distanceTo(StartLat, StartLng,EndLat, EndLng, "K"));
+        System.out.println("Distance is: " + distanceTo(StartLat, StartLng, EndLat, EndLng, "K"));
 
-        double distance = distanceTo(StartLat, StartLng,EndLat, EndLng, "K");
+        double distance = distanceTo(StartLat, StartLng, EndLat, EndLng, "K");
 
-        double angle = getAngle(StartLat,StartLng,EndLat,EndLng);
+        double angle = getAngle(StartLat, StartLng, EndLat, EndLng);
 
         // careful if altering this code: in western hemisphere minus latitude is right and plus latitude is left
         // right upper quadrant//distance / distanceScale
-        if (0.0<=angle&&angle<=90.0){
+        if (0.0 <= angle && angle <= 90.0) {
             StartLatCOORD = StartLat - ((ThresholdDistance) / (110.574));//.----->
             EndLatCOORD = EndLat + ((ThresholdDistance) / (110.574));//<------. # note plus becuae minus latt is increasing direction
-            StartLngCOORD = StartLng - (ThresholdDistance ) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));//down
-            EndLngCOORD = EndLng + (ThresholdDistance ) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));//^
+            StartLngCOORD = StartLng - (ThresholdDistance) / (111.320 * Math.cos(Math.toRadians(StartLatCOORD)));//down
+            EndLngCOORD = EndLng + (ThresholdDistance) / (111.320 * Math.cos(Math.toRadians(EndLatCOORD)));//^
         }
         // left upper quadrant
-        else if(90.0<=angle&&angle<=180.0){
-            StartLatCOORD = StartLat - ((ThresholdDistance ) / (110.574));
-            EndLatCOORD = EndLat + ((ThresholdDistance ) / (110.574));
-            StartLngCOORD = StartLng + (ThresholdDistance) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));
-            EndLngCOORD = EndLng - (ThresholdDistance) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));
+        else if (90.0 <= angle && angle <= 180.0) {
+            StartLatCOORD = StartLat - ((ThresholdDistance) / (110.574));
+            EndLatCOORD = EndLat + ((ThresholdDistance) / (110.574));
+            StartLngCOORD = StartLng + (ThresholdDistance) / (111.320 * Math.cos(Math.toRadians(StartLatCOORD)));
+            EndLngCOORD = EndLng - (ThresholdDistance) / (111.320 * Math.cos(Math.toRadians(EndLatCOORD)));
         }
         //left bottom quadrant
-        else if(-180.0<=angle&&angle<=-90.0){
+        else if (-180.0 <= angle && angle <= -90.0) {
             StartLatCOORD = StartLat + ((ThresholdDistance) / (110.574));
             EndLatCOORD = EndLat - ((ThresholdDistance) / (110.574));
-            StartLngCOORD = StartLng + (ThresholdDistance ) / (111.320*Math.cos(Math.toRadians(StartLatCOORD)));
-            EndLngCOORD = EndLng - (ThresholdDistance) / (111.320*Math.cos(Math.toRadians(EndLatCOORD)));
+            StartLngCOORD = StartLng + (ThresholdDistance) / (111.320 * Math.cos(Math.toRadians(StartLatCOORD)));
+            EndLngCOORD = EndLng - (ThresholdDistance) / (111.320 * Math.cos(Math.toRadians(EndLatCOORD)));
         }
         // right bottom quadrant
-        else if(-90.0<=angle&&angle<=0.0){
-            StartLatCOORD = StartLat + ((ThresholdDistance ) / (110.574));
+        else if (-90.0 <= angle && angle <= 0.0) {
+            StartLatCOORD = StartLat + ((ThresholdDistance) / (110.574));
             EndLatCOORD = EndLat - ((ThresholdDistance) / (110.574));
-            StartLngCOORD = StartLng - (ThresholdDistance)/(111.320*Math.cos(Math.toRadians(StartLatCOORD)));
+            StartLngCOORD = StartLng - (ThresholdDistance) / (111.320 * Math.cos(Math.toRadians(StartLatCOORD)));
             EndLngCOORD = EndLng + (ThresholdDistance) / (111.320 * Math.cos(Math.toRadians(EndLatCOORD)));
         }
-        System.out.println("Angle is: "+angle);
-        System.out.println("This is the old position for the bounding box: lat: "+StartLat+","+StartLng);
-        System.out.println("This is the old position for the bounding box: lat: "+EndLat+","+EndLng);
-        System.out.println("This is the new position for the bounding box: lat: "+EndLatCOORD+","+EndLngCOORD);
-        System.out.println("This is the new position for the bounding box: lat: "+StartLatCOORD+","+StartLngCOORD);
+        System.out.println("Angle is: " + angle);
+        System.out.println("This is the old position for the bounding box: lat: " + StartLat + "," + StartLng);
+        System.out.println("This is the old position for the bounding box: lat: " + EndLat + "," + EndLng);
+        System.out.println("This is the new position for the bounding box: lat: " + EndLatCOORD + "," + EndLngCOORD);
+        System.out.println("This is the new position for the bounding box: lat: " + StartLatCOORD + "," + StartLngCOORD);
 
 
-        String BusNodesQuery =  "SELECT *\n" +
-                                "FROM dublinbusstops\n" +
-                                "WHERE \n" +
-                                "  dublinbusstops.geom && ST_MakeEnvelope("+StartLatCOORD+","+ StartLngCOORD+","+ EndLatCOORD+","+ EndLngCOORD+",4326);";
+        String BusNodesQuery = "SELECT *\n" +
+                "FROM dublinbusstops\n" +
+                "WHERE \n" +
+                "  dublinbusstops.geom && ST_MakeEnvelope(" + StartLatCOORD + "," + StartLngCOORD + "," + EndLatCOORD + "," + EndLngCOORD + ",4326);";
 
 
-        String BusNodesDistanceQueryStartPoint =  "SELECT  st_distance_sphere(st_point("+StartLat+", "+StartLng+"), st_point(dublinbusstops.x, dublinbusstops.y))\n"+
-                "FROM dublinbusstops\n"+
-                "WHERE dublinbusstops.geom && ST_MakeEnvelope("+StartLatCOORD+","+ StartLngCOORD+","+ EndLatCOORD+","+ EndLngCOORD+", 4326)\n";
+        String BusNodesDistanceQueryStartPoint = "SELECT  st_distance_sphere(st_point(" + StartLat + ", " + StartLng + "), st_point(dublinbusstops.x, dublinbusstops.y))\n" +
+                "FROM dublinbusstops\n" +
+                "WHERE dublinbusstops.geom && ST_MakeEnvelope(" + StartLatCOORD + "," + StartLngCOORD + "," + EndLatCOORD + "," + EndLngCOORD + ", 4326)\n";
 
 
+        String BusNodesDistanceQueryEndPoint = "SELECT  st_distance_sphere(st_point(" + EndLat + ", " + EndLng + "), st_point(dublinbusstops.x, dublinbusstops.y))\n" +
+                "FROM dublinbusstops\n" +
+                "WHERE dublinbusstops.geom && ST_MakeEnvelope(" + StartLatCOORD + "," + StartLngCOORD + "," + EndLatCOORD + "," + EndLngCOORD + ", 4326)\n";
 
-        String BusNodesDistanceQueryEndPoint =  "SELECT  st_distance_sphere(st_point("+EndLat+", "+EndLng+"), st_point(dublinbusstops.x, dublinbusstops.y))\n"+
-                "FROM dublinbusstops\n"+
-                "WHERE dublinbusstops.geom && ST_MakeEnvelope("+StartLatCOORD+","+ StartLngCOORD+","+ EndLatCOORD+","+ EndLngCOORD+", 4326)\n";
+        String LuasNodesQuery = "SELECT *\n" +
+                "FROM luas\n" +
+                "WHERE \n" +
+                "  luas.geom && ST_MakeEnvelope(" + StartLatCOORD + "," + StartLngCOORD + "," + EndLatCOORD + "," + EndLngCOORD + ",4326);";
+
+
+        String LuasNodesDistanceQueryStartPoint = "SELECT  st_distance_sphere(st_point(" + StartLat + ", " + StartLng + "), st_point(luas.x, luas.y))\n" +
+                "FROM luas\n" +
+                "WHERE luas.geom && ST_MakeEnvelope(" + StartLatCOORD + "," + StartLngCOORD + "," + EndLatCOORD + "," + EndLngCOORD + ", 4326)\n";
+
+
+        String LuasNodesDistanceQueryEndPoint = "SELECT  st_distance_sphere(st_point(" + EndLat + ", " + EndLng + "), st_point(luas.x, luas.y))\n" +
+                "FROM luas\n" +
+                "WHERE luas.geom && ST_MakeEnvelope(" + StartLatCOORD + "," + StartLngCOORD + "," + EndLatCOORD + "," + EndLngCOORD + ", 4326)\n";
 
 
         //database connection
@@ -109,115 +125,202 @@ public class NodeCreationManager {
 
         //connection properties
         Properties props = new Properties();
-        props.setProperty("user","bwtgzdutmqrmca");
-        props.setProperty("password","8b0a6af0e5d2a05bd6a462e8fb42320d0786a857ee56fd4aa4df9193583bd697");
-        props.setProperty("sslmode","require");
+        props.setProperty("user", "bwtgzdutmqrmca");
+        props.setProperty("password", "8b0a6af0e5d2a05bd6a462e8fb42320d0786a857ee56fd4aa4df9193583bd697");
+        props.setProperty("sslmode", "require");
 
+        // enter bus call
+        if (isLuas != true) {
 
-        //can be taken out later queries the database to ensure connection
-        try (Connection con = DriverManager.getConnection(url, props);
-             Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery("SELECT VERSION()")) {
+            //can be taken out later queries the database to ensure connection
+            try (Connection con = DriverManager.getConnection(url, props);
+                 Statement st = con.createStatement();
+                 ResultSet rs = st.executeQuery("SELECT VERSION()")) {
 
-            if (rs.next()) {
-                System.out.println(rs.getString(1));
-            }
-
-
-        } catch (SQLException ex) {
-
-            Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
-            lgr.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-
-        long startTime = System.currentTimeMillis();
-        try (Connection con = DriverManager.getConnection(url, props);
-             Statement st1 = con.createStatement();
-             ResultSet rs1 = st1.executeQuery(BusNodesQuery)) {
-
-            ResultSetMetaData rsmd = rs1.getMetaData();
-            int columnsNumber = rsmd.getColumnCount();
-            while (rs1.next()) {
-                for (int i = 1; i <= columnsNumber; i++) {
-                    if (i > 1) System.out.print(",  ");
-                    String columnValue = rs1.getString(i);
-                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                if (rs.next()) {
+                    System.out.println(rs.getString(1));
                 }
-                String stopID = rs1.getString(2);
-                int stopIDNumber = Integer.parseInt(stopID.substring(stopID.length()-4));
-                Node busNode = new Node(rs1.getString(3),stopIDNumber,1,rs1.getDouble(4),rs1.getDouble(5),99);
-                BusNodeList.add(busNode);
-                System.out.println("");
+
+
+            } catch (SQLException ex) {
+
+                Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
+                lgr.log(Level.SEVERE, ex.getMessage(), ex);
             }
-            long endTime = System.currentTimeMillis();
 
-            System.out.println("That took " + (endTime - startTime) + " milliseconds");
+            long startTime = System.currentTimeMillis();
+            try (Connection con = DriverManager.getConnection(url, props);
+                 Statement st1 = con.createStatement();
+                 ResultSet rs1 = st1.executeQuery(BusNodesQuery)) {
 
-
-
-        } catch (SQLException ex) {
-
-            Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
-            lgr.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-
-
-
-        //get distance to start point
-        try (Connection con2 = DriverManager.getConnection(url, props);
-             Statement st2 = con2.createStatement();
-             ResultSet rs2 = st2.executeQuery(BusNodesDistanceQueryStartPoint)) {
-
-            ResultSetMetaData rsmd = rs2.getMetaData();
-            int columnsNumber = rsmd.getColumnCount();
-            int counter=0;
-            while (rs2.next()) {
-                for (int i = 1; i <= columnsNumber; i++) {
-                    String columnValue = rs2.getString(i);
+                ResultSetMetaData rsmd = rs1.getMetaData();
+                int columnsNumber = rsmd.getColumnCount();
+                while (rs1.next()) {
+                    for (int i = 1; i <= columnsNumber; i++) {
+                        if (i > 1) System.out.print(",  ");
+                        String columnValue = rs1.getString(i);
+                        System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                    }
+                    String stopID = rs1.getString(2);
+                    int stopIDNumber = Integer.parseInt(stopID.substring(stopID.length() - 4));
+                    Node busNode = new Node(rs1.getString(3), stopIDNumber, 1, rs1.getDouble(4), rs1.getDouble(5), 99);
+                    BusNodeList.add(busNode);
+                    System.out.println("");
                 }
-                Node currentStop = BusNodeList.get(counter);
-                currentStop.setDistanceToStartLocation(rs2.getDouble(1));
-                counter=counter+1;
+                long endTime = System.currentTimeMillis();
+
+                System.out.println("That took " + (endTime - startTime) + " milliseconds");
+
+
+            } catch (SQLException ex) {
+
+                Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
+                lgr.log(Level.SEVERE, ex.getMessage(), ex);
             }
-        } catch (SQLException ex) {
-
-            Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
-            lgr.log(Level.SEVERE, ex.getMessage(), ex);
-        }
 
 
+            //get distance to start point
+            try (Connection con2 = DriverManager.getConnection(url, props);
+                 Statement st2 = con2.createStatement();
+                 ResultSet rs2 = st2.executeQuery(BusNodesDistanceQueryStartPoint)) {
 
-
-        //get distance to end point
-        try (Connection con3 = DriverManager.getConnection(url, props);
-             Statement st3 = con3.createStatement();
-             ResultSet rs3 = st3.executeQuery(BusNodesDistanceQueryEndPoint)) {
-
-            ResultSetMetaData rsmd = rs3.getMetaData();
-            int columnsNumber = rsmd.getColumnCount();
-            int counter=0;
-            while (rs3.next()) {
-                for (int i = 1; i <= columnsNumber; i++) {
-                    String columnValue = rs3.getString(i);
+                ResultSetMetaData rsmd = rs2.getMetaData();
+                int columnsNumber = rsmd.getColumnCount();
+                int counter = 0;
+                while (rs2.next()) {
+                    for (int i = 1; i <= columnsNumber; i++) {
+                        String columnValue = rs2.getString(i);
+                    }
+                    Node currentStop = BusNodeList.get(counter);
+                    currentStop.setDistanceToStartLocation(rs2.getDouble(1));
+                    counter = counter + 1;
                 }
-                Node currentStop = BusNodeList.get(counter);
-                currentStop.setDistanceToEndLocation(rs3.getDouble(1));
-                System.out.println("");
-                counter=counter+1;
+            } catch (SQLException ex) {
+
+                Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
+                lgr.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
 
-        } catch (SQLException ex) {
+            //get distance to end point
+            try (Connection con3 = DriverManager.getConnection(url, props);
+                 Statement st3 = con3.createStatement();
+                 ResultSet rs3 = st3.executeQuery(BusNodesDistanceQueryEndPoint)) {
 
-            Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
-            lgr.log(Level.SEVERE, ex.getMessage(), ex);
+                ResultSetMetaData rsmd = rs3.getMetaData();
+                int columnsNumber = rsmd.getColumnCount();
+                int counter = 0;
+                while (rs3.next()) {
+                    for (int i = 1; i <= columnsNumber; i++) {
+                        String columnValue = rs3.getString(i);
+                    }
+                    Node currentStop = BusNodeList.get(counter);
+                    currentStop.setDistanceToEndLocation(rs3.getDouble(1));
+                    System.out.println("");
+                    counter = counter + 1;
+                }
+
+
+            } catch (SQLException ex) {
+
+                Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
+                lgr.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+            for (Node node : BusNodeList) {
+                System.out.println("Bus Stop Number: " + node.getStopId());
+                System.out.println("Distnace to start loaction: " + node.getDistanceToStartLocation());
+                System.out.println("Distance to end location: " + node.getDistanceToEndLocation());
+            }
+            return BusNodeList;
         }
-        for(Node node:BusNodeList) {
-            System.out.println("Bus Stop Number: "+node.getStopId());
-            System.out.println("Distnace to start loaction: "+node.getDistanceToStartLocation());
-            System.out.println("Distance to end location: "+node.getDistanceToEndLocation());
+        // enter Luas call
+        else {
+
+            long startTime = System.currentTimeMillis();
+            try (Connection con = DriverManager.getConnection(url, props);
+                 Statement st1 = con.createStatement();
+                 ResultSet rs1 = st1.executeQuery(LuasNodesQuery)) {
+
+                ResultSetMetaData rsmd = rs1.getMetaData();
+                int columnsNumber = rsmd.getColumnCount();
+                while (rs1.next()) {
+                    for (int i = 1; i <= columnsNumber; i++) {
+                        if (i > 1) System.out.print(",  ");
+                        String columnValue = rs1.getString(i);
+                        System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                    }
+                    int stopIDNumber = rs1.getInt(1);
+                    Node LuasNode = new Node(rs1.getString(3), stopIDNumber, 2, rs1.getDouble(4), rs1.getDouble(5), 99);
+                    LuasNodeList.add(LuasNode);
+                    System.out.println("");
+                }
+                long endTime = System.currentTimeMillis();
+
+                System.out.println("That took " + (endTime - startTime) + " milliseconds");
+
+
+            } catch (SQLException ex) {
+
+                Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
+                lgr.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+
+
+            //get distance to start point
+            try (Connection con2 = DriverManager.getConnection(url, props);
+                 Statement st2 = con2.createStatement();
+                 ResultSet rs2 = st2.executeQuery(LuasNodesDistanceQueryStartPoint)) {
+
+                ResultSetMetaData rsmd = rs2.getMetaData();
+                int columnsNumber = rsmd.getColumnCount();
+                int counter = 0;
+                while (rs2.next()) {
+                    for (int i = 1; i <= columnsNumber; i++) {
+                        String columnValue = rs2.getString(i);
+                    }
+                    Node currentStop = LuasNodeList.get(counter);
+                    currentStop.setDistanceToStartLocation(rs2.getDouble(1));
+                    counter = counter + 1;
+                }
+            } catch (SQLException ex) {
+
+                Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
+                lgr.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+
+
+            //get distance to end point
+            try (Connection con3 = DriverManager.getConnection(url, props);
+                 Statement st3 = con3.createStatement();
+                 ResultSet rs3 = st3.executeQuery(LuasNodesDistanceQueryEndPoint)) {
+
+                ResultSetMetaData rsmd = rs3.getMetaData();
+                int columnsNumber = rsmd.getColumnCount();
+                int counter = 0;
+                while (rs3.next()) {
+                    for (int i = 1; i <= columnsNumber; i++) {
+                        String columnValue = rs3.getString(i);
+                    }
+                    Node currentStop = LuasNodeList.get(counter);
+                    currentStop.setDistanceToEndLocation(rs3.getDouble(1));
+                    System.out.println("");
+                    counter = counter + 1;
+                }
+
+
+            } catch (SQLException ex) {
+
+                Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
+                lgr.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+            for (Node node : LuasNodeList) {
+                System.out.println("Luas Stop Number: " + node.getStopId());
+                System.out.println("Distance to start location: " + node.getDistanceToStartLocation());
+                System.out.println("Distance to end location: " + node.getDistanceToEndLocation());
+            }
+            return LuasNodeList;
         }
-        return BusNodeList;
+
     }
 
 }

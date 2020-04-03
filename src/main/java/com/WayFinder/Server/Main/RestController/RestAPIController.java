@@ -13,6 +13,7 @@ import java.util.Comparator;
 
 import com.WayFinder.Server.Main.NodeCreation.Node;
 import com.WayFinder.Server.Main.NodeCreation.NodeCreationManager;
+import com.WayFinder.Server.Main.NodeMinimisation.MinimizedPaths;
 import com.WayFinder.Server.Main.NodeMinimisation.NodeMinimisationManager;
 import com.WayFinder.Server.Main.Parsers.GoogleDirectionsParser;
 import com.WayFinder.Server.Main.Parsers.LuasAPIParser;
@@ -105,19 +106,47 @@ public class RestAPIController {
         myRestAPIRequestInformation.add(request);
 
         NodeCreationManager NodeCreationManager=new NodeCreationManager();
-        ArrayList<Node> busStopList = NodeCreationManager.getNodes(request.getStartLocation().lat, request.getStartLocation().lng,request.getEndLocation().lat, request.getEndLocation().lng);
+        ArrayList<Node> busStopList = NodeCreationManager.getNodes(request.getStartLocation().lat, request.getStartLocation().lng,request.getEndLocation().lat, request.getEndLocation().lng,false);
+        ArrayList<Node> luasStopList = NodeCreationManager.getNodes(request.getStartLocation().lat, request.getStartLocation().lng,request.getEndLocation().lat, request.getEndLocation().lng,true);
+
 
         NodeMinimisationManager nodeMinimisation = new NodeMinimisationManager();
-        ArrayList<Node> BusStopsNodes = nodeMinimisation.minimiseNodes(busStopList, new LatLng(request.getStartLocation().lat, request.getStartLocation().lng),new LatLng(request.getEndLocation().lat, request.getEndLocation().lng));
+        ArrayList<Node> BusStopsNodes = nodeMinimisation.getBusNodes(busStopList, new LatLng(request.getStartLocation().lat, request.getStartLocation().lng),new LatLng(request.getEndLocation().lat, request.getEndLocation().lng));
+        ArrayList<Node> LuasStopsNodes = nodeMinimisation.getLuasNodes(luasStopList, new LatLng(request.getStartLocation().lat, request.getStartLocation().lng),new LatLng(request.getEndLocation().lat, request.getEndLocation().lng));
 
-        System.out.println("Bus stop list size: "+BusStopsNodes.size());
+        ArrayList<Node> MinimisedStopNodes = null;
+        MinimizedPaths MinimisedStops = null;
+        // both sets of nodes are greateer then 3
+        if(BusStopsNodes.size()>3&&LuasStopsNodes.size()>3){
+            MinimisedStops = nodeMinimisation.minimiseToFinalNodes(BusStopsNodes,LuasStopsNodes);
 
-        RouteWeightCalculationManager routeWeightCalculationManager= new RouteWeightCalculationManager();
-        ArrayList<Edge> edgeList = routeWeightCalculationManager.calculateRouteWeights(BusStopsNodes);
+            for(Node busStop : MinimisedStops.getBusStopList()) {
+                System.out.println("Final BUS Stop and Luas:"+busStop.getStopId());
+            }
+            for(Node busStop : MinimisedStops.getLuasStopList()) {
+                System.out.println("Final Bus Stop and LUAS:"+busStop.getStopId());
+            }
+        }
+        else if(BusStopsNodes.size()>3){
+            MinimisedStopNodes = nodeMinimisation.getMinimizedBusList(BusStopsNodes, new LatLng(request.getStartLocation().lat, request.getStartLocation().lng),new LatLng(request.getEndLocation().lat, request.getEndLocation().lng));
+            for(Node busStop : MinimisedStopNodes) {
+                System.out.println("Final Bus Stop:"+busStop.getStopId());
+            }
+        }else if(LuasStopsNodes.size()>3){
+            MinimisedStopNodes = nodeMinimisation.getMinimizedLuasList(LuasStopsNodes);
+            for(Node luasStop : MinimisedStopNodes) {
+                System.out.println("Final luas Stop:"+luasStop.getStopId());
+            }
+        }
+
+        System.out.println("Bus stop list size: "+MinimisedStops.getBusStopList().size());
+
+        RouteWeightCalculationManager routeWeightCalculationManager = new RouteWeightCalculationManager();
+        ArrayList<Edge> edgeList = routeWeightCalculationManager.calculateRouteWeights(MinimisedStops.getLuasStopList());
 
         System.out.println("final edge list size: "+edgeList.size());
         DijkstraAlgorithmManager runNodeGraph = new DijkstraAlgorithmManager();
-        LinkedList<Node> finalPath = runNodeGraph.ExecuteAlgorithm(BusStopsNodes,edgeList);
+        LinkedList<Node> finalPath = runNodeGraph.ExecuteAlgorithm(MinimisedStops.getLuasStopList(),edgeList);
 
 
         //add users start and finish location to the list
@@ -131,7 +160,7 @@ public class RestAPIController {
         for (Node node : finalPath) {
             System.out.println("Final Path:"+node.getStopId());
         }
-        
+
         RouteJSONData routeJSONData = new RouteJSONData();
         ArrayList<String> apiRequest = routeJSONData.getJSONpath(finalPath,edgeList);
 
@@ -142,7 +171,8 @@ public class RestAPIController {
         HTTPRequest httpRequest = new HTTPRequest();
         GoogleDirectionsParser googleDirectionsParser= new GoogleDirectionsParser();
 
-        long currentLegTime = System.currentTimeMillis() / 1000;
+        //long currentLegTime = (System.currentTimeMillis() / 1000);1583413500000
+        long currentLegTime = 1586088300;
         int index = 0;
         String busRoute = null;
 
@@ -167,9 +197,23 @@ public class RestAPIController {
                 index+=1;
                 continue;
             }
-            //bus train
-            if(APIRequest.contains("mode=transit")){
+            //bus
+            if(APIRequest.contains("mode=transit")&&!APIRequest.contains("tram")){
                 routeResponse = googleDirectionsParser.ParseBusStop(response);
+                FinalRoute finalRoutePoint = new FinalRoute(routeJSONData.getNodeFromString(APIRequest,finalPath,"ogn"),routeJSONData.getNodeFromString(APIRequest,finalPath,"dst"),routeResponse.getOverviewPolyline(),transportType,routeResponse.getLength(),routeResponse.getRoute(),routeResponse.getDepartureTime());
+                if(busRoute==null){
+                    busRoute = finalRoutePoint.getRouteNumber();
+                }else{
+                    finalRoutePoint.setRouteNumber(busRoute);
+                }
+                result.add(finalRoutePoint);
+                currentLegTime+=finalRoutePoint.getLengthMinutes();
+                index+=1;
+                continue;
+            }
+            //train
+            if(APIRequest.contains("mode=transit")&&APIRequest.contains("tram")){
+                routeResponse = googleDirectionsParser.ParseLuasStopResponse(response);
                 FinalRoute finalRoutePoint = new FinalRoute(routeJSONData.getNodeFromString(APIRequest,finalPath,"ogn"),routeJSONData.getNodeFromString(APIRequest,finalPath,"dst"),routeResponse.getOverviewPolyline(),transportType,routeResponse.getLength(),routeResponse.getRoute(),routeResponse.getDepartureTime());
                 if(busRoute==null){
                     busRoute = finalRoutePoint.getRouteNumber();
@@ -203,6 +247,7 @@ public class RestAPIController {
 
 
         return ResponseEntity.ok(result);
+        //return ResponseEntity.ok(result);
     }
 
     @PostMapping(value = "/luasroute")

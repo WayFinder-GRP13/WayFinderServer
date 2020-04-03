@@ -60,7 +60,7 @@ public class RouteJSONData {
 
                 apiRequest.append("origin="+skipOrigin.getLatitude()+","+skipOrigin.getLongitudue()+"&");
                 apiRequest.append("destination="+destination.getLatitude()+","+destination.getLongitudue()+"&");
-                apiRequest.append("mode="+routeTypes.get(getTransitType(edgeList,pathList.get(i-1),origin)));
+                apiRequest.append("mode="+routeTypes.get(getTransitType(edgeList,pathList.get(i-1),origin))+"&transit_mode=tram&");
                 apiRequest.append("&key=AIzaSyCqCdlPmegML3DEtc7BL9X1RFVsm8lEBbE");
                 googleRequests.add(apiRequest.toString());
                 System.out.println("got inside this api setting loop: "+apiRequest.toString());

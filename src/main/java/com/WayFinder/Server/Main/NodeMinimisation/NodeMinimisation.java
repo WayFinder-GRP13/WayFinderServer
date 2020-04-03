@@ -15,9 +15,14 @@ public class NodeMinimisation {
     // this values gets the closest nodes to start and end points
     private int CloseNodeCheckAmount = 1;
     private int MatchedIndex;
-    ArrayList<Node> SortedDistanceStartNodes = new ArrayList<>();
-    ArrayList<Node> SortedDistanceEndNodes = new ArrayList<>();
-    ArrayList<String> MatchingRouteStops = new ArrayList<>();
+    ArrayList<Node> SortedDistanceStartBusNodes = new ArrayList<>();
+    ArrayList<Node> SortedDistanceEndBusNodes = new ArrayList<>();
+    ArrayList<String> MatchingRouteBusStops = new ArrayList<>();
+
+    ArrayList<Node> SortedDistanceStartLuasNodes = new ArrayList<>();
+    ArrayList<Node> SortedDistanceEndLuasNodes = new ArrayList<>();
+    ArrayList<String> MatchingRouteLuasStops = new ArrayList<>();
+
 
 
     //     this method cycles through bus stops in order checking
@@ -25,7 +30,7 @@ public class NodeMinimisation {
 //     where A is closest node to start point and
 //     Z is closest node to end point
 //     if no match is found it will return null
-    public ArrayList<String> findMatchingRoutes(ArrayList<Node> initialStopList) {
+    public ArrayList<String> findMatchingBusRoutes(ArrayList<Node> initialStopList) {
 
 
         //sort distance from shortest node to start point to furthest node to start point
@@ -34,7 +39,7 @@ public class NodeMinimisation {
         // does a deep copy of the sorted array of start location distances
         for (Node node : initialStopList) {
             //Add the object clones
-            SortedDistanceStartNodes.add(new Node(node));
+            SortedDistanceStartBusNodes.add(new Node(node));
             System.out.println("Sorted distance bus nodes to start point: "+node.getStopId()+" distance: "+node.getDistanceToStartLocation());
         }
 
@@ -44,7 +49,7 @@ public class NodeMinimisation {
         // does a deep copy of the sorted array of end location distances
         for (Node node : initialStopList) {
             //Add the object clones
-            SortedDistanceEndNodes.add(new Node(node));
+            SortedDistanceEndBusNodes.add(new Node(node));
             System.out.println("Sorted distance bus nodes to end point: "+node.getStopId()+" distance: "+node.getDistanceToEndLocation());
         }
 
@@ -54,10 +59,10 @@ public class NodeMinimisation {
         // checks A-Z then A-Y then Z-B and does next loop if none match
         for (int i = 0; i < initialStopList.size() / 2; i += 2) {
             // node assignment makes for easier code readability
-            Node A = SortedDistanceStartNodes.get(i);
-            Node B = SortedDistanceStartNodes.get(i + 1);
-            Node Y = SortedDistanceEndNodes.get(i + 1);
-            Node Z = SortedDistanceEndNodes.get(i);
+            Node A = SortedDistanceStartBusNodes.get(i);
+            Node B = SortedDistanceStartBusNodes.get(i + 1);
+            Node Y = SortedDistanceEndBusNodes.get(i + 1);
+            Node Z = SortedDistanceEndBusNodes.get(i);
 
             // gets route information for the bus stop
             // currently not stored in db but should be?
@@ -83,7 +88,7 @@ public class NodeMinimisation {
                 System.out.println("Z Bus Stop: "+Arrays.toString(Z.getTransportRoute().toArray()));
                 System.out.println("Z routes: "+Z.getStopId());
                 //adds the route to the common bus list
-                MatchingRouteStops.addAll(common);
+                MatchingRouteBusStops.addAll(common);
                 return common;
             } else {
                 //reset arraylist
@@ -99,7 +104,7 @@ public class NodeMinimisation {
                 System.out.println("Z Bus Stop: "+Arrays.toString(Z.getTransportRoute().toArray()));
                 System.out.println("Z routes: "+Z.getStopId());
                 //adds the route to the common bus list
-                MatchingRouteStops.addAll(common);
+                MatchingRouteBusStops.addAll(common);
                 return common;
             } else {
                 //reset arraylist
@@ -113,7 +118,7 @@ public class NodeMinimisation {
                 System.out.println("Y routes: "+Arrays.toString(Y.getTransportRoute().toArray()));
                 System.out.println("B routes: "+Arrays.toString(B.getTransportRoute().toArray()));
                 //adds the route to the common bus list
-                MatchingRouteStops.addAll(common);
+                MatchingRouteBusStops.addAll(common);
                 return common;
             }
 
@@ -131,8 +136,8 @@ public class NodeMinimisation {
 
         //gets the route data for start and end bus stop from match index to count value
         for (int i = MatchedIndex; i<MatchedIndex+CloseNodeCheckAmount; i++) {
-            Node currentStartNode = SortedDistanceStartNodes.get(i);
-            Node currentEndNode = SortedDistanceEndNodes.get(i);
+            Node currentStartNode = SortedDistanceStartBusNodes.get(i);
+            Node currentEndNode = SortedDistanceEndBusNodes.get(i);
             try {
                 currentStartNode.setTransportRoute(busAPIController.getBusStopInfo(currentStartNode.getStopId()).getTransportRoute());
                 currentEndNode.setTransportRoute(busAPIController.getBusStopInfo(currentEndNode.getStopId()).getTransportRoute());
@@ -145,12 +150,12 @@ public class NodeMinimisation {
         // both index counts count to x if available
         int outerIndexCount = 0;
         for (int i = MatchedIndex; i<MatchedIndex+CloseNodeCheckAmount; i++) {
-            Node endBusStop = SortedDistanceEndNodes.get(i);
+            Node endBusStop = SortedDistanceEndBusNodes.get(i);
             int innerIndexCount = 0;
 
             //inner loop to check the 5 stops
             for (int j = MatchedIndex; j<MatchedIndex+CloseNodeCheckAmount; j++) {
-                Node startBusStop = SortedDistanceStartNodes.get(j);
+                Node startBusStop = SortedDistanceStartBusNodes.get(j);
                 // this gets the end stop information
                 ArrayList<String> EndStopBusRoutes = endBusStop.getTransportRoute();
                 //This gets start stop route information
@@ -164,9 +169,9 @@ public class NodeMinimisation {
                     //loop through all the routes and add them to a list
                     for (String route : StartStopBusRoutes) {
                         //check if the route is already in the list
-                        if (!MatchingRouteStops.contains(route)) {
+                        if (!MatchingRouteBusStops.contains(route)) {
 
-                            MatchingRouteStops.add(route);
+                            MatchingRouteBusStops.add(route);
 
                         } else {
 
@@ -193,66 +198,73 @@ public class NodeMinimisation {
                 continue;
             }
         }
-        System.out.println("further amount of routes: " + MatchingRouteStops.size());
-        return MatchingRouteStops;
+        System.out.println("further amount of routes: " + MatchingRouteBusStops.size());
+        return MatchingRouteBusStops;
     }
 
 
-    public ArrayList<Node> minimiseNodeList(ArrayList<Node> initialStopList,LatLng startLocation, LatLng endLocation) {
-        ArrayList<Node> finalOutputList = new ArrayList<>();
+    public ArrayList<Node> getStopList(ArrayList<Node> initialStopList,LatLng startLocation, LatLng endLocation) {
         // go through the routes and get all matching stops for that routes
-        //for (String matchedRoute : MatchingRouteStops) {
-            try {
-                // call the bus api to get all bus stops for the route
-                System.out.println("Chosen Route was: "+MatchingRouteStops.get(4));
-                BusRouteList routeList = busAPIController.getRouteInformation(MatchingRouteStops.get(4));
-                ArrayList<BusRoute> busStopRouteList = new ArrayList<>();
-                for (BusRoute route : routeList.getBusRouteList()) {
-                    Node StartStopRoute = route.getBusStopList().get(0);
-                    Node FinalStopRoute = route.getBusStopList().get(route.getBusStopList().size() - 1);
+        try {
+            // call the bus api to get all bus stops for the route
+            System.out.println("Chosen Route was: " + MatchingRouteBusStops.get(4));
+            BusRouteList routeList = busAPIController.getRouteInformation(MatchingRouteBusStops.get(4));
+            ArrayList<BusRoute> busStopRouteList = new ArrayList<>();
+            for (BusRoute route : routeList.getBusRouteList()) {
+                Node StartStopRoute = route.getBusStopList().get(0);
+                Node FinalStopRoute = route.getBusStopList().get(route.getBusStopList().size() - 1);
 
-                    double DistanceToStartFromBoxStart = distanceTo(StartStopRoute.getLatitude(), StartStopRoute.getLongitudue(), startLocation.lat, startLocation.lng, "K");
-                    double DistanceToStartFromBoxEnd = distanceTo(StartStopRoute.getLatitude(), StartStopRoute.getLongitudue(), endLocation.lat, endLocation.lng, "K");
-                    double DistanceToEndFromBoxStart = distanceTo(FinalStopRoute.getLatitude(), FinalStopRoute.getLongitudue(), startLocation.lat, startLocation.lng, "K");
-                    double DistanceToEndFromBoxEnd = distanceTo(FinalStopRoute.getLatitude(), FinalStopRoute.getLongitudue(), endLocation.lat, endLocation.lng, "K");
-                    if (DistanceToStartFromBoxStart < DistanceToStartFromBoxEnd && DistanceToEndFromBoxStart > DistanceToEndFromBoxEnd) {
-                        busStopRouteList.add(route);
-                        System.out.println("user start to bus start"+DistanceToStartFromBoxStart);
-                        System.out.println("user end to bus start"+DistanceToStartFromBoxEnd);
-                        System.out.println("user start to bus end"+DistanceToEndFromBoxStart);
-                        System.out.println("user end to bus end"+DistanceToEndFromBoxEnd);
-                        // not sure about the break statement here
-                        break;
-                    }
-
-
+                double DistanceToStartFromBoxStart = distanceTo(StartStopRoute.getLatitude(), StartStopRoute.getLongitudue(), startLocation.lat, startLocation.lng, "K");
+                double DistanceToStartFromBoxEnd = distanceTo(StartStopRoute.getLatitude(), StartStopRoute.getLongitudue(), endLocation.lat, endLocation.lng, "K");
+                double DistanceToEndFromBoxStart = distanceTo(FinalStopRoute.getLatitude(), FinalStopRoute.getLongitudue(), startLocation.lat, startLocation.lng, "K");
+                double DistanceToEndFromBoxEnd = distanceTo(FinalStopRoute.getLatitude(), FinalStopRoute.getLongitudue(), endLocation.lat, endLocation.lng, "K");
+                if (DistanceToStartFromBoxStart < DistanceToStartFromBoxEnd && DistanceToEndFromBoxStart > DistanceToEndFromBoxEnd) {
+                    busStopRouteList.add(route);
+                    System.out.println("user start to bus start" + DistanceToStartFromBoxStart);
+                    System.out.println("user end to bus start" + DistanceToStartFromBoxEnd);
+                    System.out.println("user start to bus end" + DistanceToEndFromBoxStart);
+                    System.out.println("user end to bus end" + DistanceToEndFromBoxEnd);
+                    // not sure about the break statement here
+                    break;
                 }
 
-                for (BusRoute route : busStopRouteList) {
-                    for(Node stop : route.getBusStopList()){
-                        System.out.println("unfiltered Bus stop: "+stop.getStopId());
-                    }
-                    // stream filter the bus stop list from the initial list to get bus stop matches inside the square
-                    ArrayList<Node> filteredStopList = (ArrayList) route.getBusStopList().stream().
-                            filter(c -> FilterBusStopsByID(c, initialStopList)).
-                            collect(Collectors.toList());
-                    route.setBusStopList(filteredStopList);
+
+            }
+
+            for (BusRoute route : busStopRouteList) {
+                for (Node stop : route.getBusStopList()) {
+                    System.out.println("unfiltered Bus stop: " + stop.getStopId());
                 }
+                // stream filter the bus stop list from the initial list to get bus stop matches inside the square
+                ArrayList<Node> filteredStopList = (ArrayList) route.getBusStopList().stream().
+                        filter(c -> FilterBusStopsByID(c, initialStopList)).
+                        collect(Collectors.toList());
+                route.setBusStopList(filteredStopList);
+            }
 
-                ArrayList<String> CheckedRoute = new ArrayList<>();
-                for (BusRoute route : busStopRouteList) {
-                    if(!CheckedRoute.contains(route.getRouteName())){
-                        CheckedRoute.add(route.getRouteName());
-                        for(Node stop : route.getBusStopList()){
-                            System.out.println("Bus stop: "+stop.getStopId());
-                        }
-                    }else{
-                        continue;
+            ArrayList<String> CheckedRoute = new ArrayList<>();
+            for (BusRoute route : busStopRouteList) {
+                if (!CheckedRoute.contains(route.getRouteName())) {
+                    CheckedRoute.add(route.getRouteName());
+                    for (Node stop : route.getBusStopList()) {
+                        System.out.println("Bus stop: " + stop.getStopId());
                     }
-                    ArrayList<Node> filteredStopList = route.getBusStopList();
+                } else {
+                    continue;
+                }
+                ArrayList<Node> filteredStopList = route.getBusStopList();
 
+                return filteredStopList;
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public ArrayList<Node> ReduceBusNodes(ArrayList<Node> filteredStopList,LatLng startLocation, LatLng endLocation){
+                    ArrayList<Node> finalOutputList = new ArrayList<>();
                     int NodeCounter = 0;
-//                    System.out.println(" final node Array size is: " + filteredStopList.size());
                     int filteredListSize = filteredStopList.size() / 2;
                     System.out.println(" divided by 2 is: " + filteredListSize);
                     System.out.println(" divided by 3 is: " + filteredStopList.size() / 3);
@@ -300,12 +312,7 @@ public class NodeMinimisation {
 
                         }
                     }
-                }
 
-                } catch(IOException e){
-                    e.printStackTrace();
-                }
-        //}
         System.out.println("Final minimised list:" + finalOutputList.size());
         for (Node node : finalOutputList) {
             System.out.println("Stop ID:" + node.getStopId());
@@ -331,5 +338,43 @@ public class NodeMinimisation {
             dist = dist * 1.609344;
         }
         return dist;
+    }
+
+    public ArrayList<Node> findMatchingLuasStops(ArrayList<Node> initialStopList,LatLng startLocation, LatLng EndLocation) {
+
+
+        //sort distance from shortest node to start point to furthest node to start point
+        Collections.sort(initialStopList, Comparator.comparingDouble(Node::getDistanceToStartLocation));
+
+        // does a deep copy of the sorted array of start location distances
+        for (Node node : initialStopList) {
+            //Add the object clones
+            SortedDistanceStartLuasNodes.add(new Node(node));
+            System.out.println("Sorted distance bus nodes to start point: " + node.getStopId() + " distance: " + node.getDistanceToStartLocation());
+        }
+
+        //sort distance from shortest node to end point to furthest node to start point
+        Collections.sort(initialStopList, Comparator.comparingDouble(Node::getDistanceToEndLocation));
+
+        // does a deep copy of the sorted array of end location distances
+        for (Node node : initialStopList) {
+            //Add the object clones
+            SortedDistanceEndLuasNodes.add(new Node(node));
+            System.out.println("Sorted distance bus nodes to end point: " + node.getStopId() + " distance: " + node.getDistanceToEndLocation());
+        }
+
+        return SortedDistanceStartLuasNodes;
+    }
+
+    public ArrayList<Node> ReduceLuasNodes(ArrayList<Node> luasStopList) {
+        ArrayList<Node>  finalList = new ArrayList<>();
+
+        for(int i=0;i<luasStopList.size();i++){
+            if(i==0||i==(int)luasStopList.size()/2||i==luasStopList.size()-1){
+                finalList.add(luasStopList.get(i));
+            }
+
+        }
+        return finalList;
     }
 }

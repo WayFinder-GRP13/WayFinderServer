@@ -18,7 +18,7 @@ public class AlgorithmMinimisation {
 
         @Test
         public void testMinimisation(){
-            ArrayList<Node> busList = nodeCreation.getNodes(53.355811, -6.228165,53.351816, -6.223656);
+            //ArrayList<Node> busList = nodeCreation.getNodes(53.355811, -6.228165,53.351816, -6.223656);
             //ArrayList<Node> minimisedBusList =nodeMinimisation.minimiseNodes(busList, new LatLng(request.getStartLocation().lat, request.getStartLocation().lng), new LatLng(request.getEndLocation().lat, request.getEndLocation().lng));
             //size
 //            assertEquals(2,minimisedBusList.size());

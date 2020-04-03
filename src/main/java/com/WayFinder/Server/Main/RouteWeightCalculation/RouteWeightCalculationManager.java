@@ -120,7 +120,7 @@ public class RouteWeightCalculationManager {
                 if(secondNode.getTransportType()==2){
                     //call walk
                     int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode);
-                    edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,walkWeight,0));
+                    edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,walkWeight,2));
 
                 }
 
