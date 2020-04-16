@@ -207,32 +207,43 @@ public class NodeMinimisation {
         // go through the routes and get all matching stops for that routes
         try {
             // call the bus api to get all bus stops for the route
-            System.out.println("Chosen Route was: " + MatchingRouteBusStops.get(4));
+            System.out.println("Chosen Route was: " + MatchingRouteBusStops.get(0));
             BusRouteList routeList = busAPIController.getRouteInformation(MatchingRouteBusStops.get(4));
             ArrayList<BusRoute> busStopRouteList = new ArrayList<>();
             for (BusRoute route : routeList.getBusRouteList()) {
                 Node StartStopRoute = route.getBusStopList().get(0);
                 Node FinalStopRoute = route.getBusStopList().get(route.getBusStopList().size() - 1);
+                System.out.println("Start stop: "+StartStopRoute.getStopId());
+                System.out.println("End: "+FinalStopRoute.getStopId());
 
                 double DistanceToStartFromBoxStart = distanceTo(StartStopRoute.getLatitude(), StartStopRoute.getLongitudue(), startLocation.lat, startLocation.lng, "K");
                 double DistanceToStartFromBoxEnd = distanceTo(StartStopRoute.getLatitude(), StartStopRoute.getLongitudue(), endLocation.lat, endLocation.lng, "K");
                 double DistanceToEndFromBoxStart = distanceTo(FinalStopRoute.getLatitude(), FinalStopRoute.getLongitudue(), startLocation.lat, startLocation.lng, "K");
                 double DistanceToEndFromBoxEnd = distanceTo(FinalStopRoute.getLatitude(), FinalStopRoute.getLongitudue(), endLocation.lat, endLocation.lng, "K");
+
+                System.out.println("DistanceToStartFromBoxStart: "+DistanceToStartFromBoxStart);
+                System.out.println("DistanceToStartFromBoxEnd: "+DistanceToStartFromBoxEnd);
+                System.out.println("DistanceToEndFromBoxStart: "+DistanceToEndFromBoxStart);
+                System.out.println("DistanceToEndFromBoxEnd: "+DistanceToEndFromBoxEnd);
                 if (DistanceToStartFromBoxStart < DistanceToStartFromBoxEnd && DistanceToEndFromBoxStart > DistanceToEndFromBoxEnd) {
                     busStopRouteList.add(route);
+                    System.out.println("Sucess: ");
                     System.out.println("user start to bus start" + DistanceToStartFromBoxStart);
                     System.out.println("user end to bus start" + DistanceToStartFromBoxEnd);
                     System.out.println("user start to bus end" + DistanceToEndFromBoxStart);
                     System.out.println("user end to bus end" + DistanceToEndFromBoxEnd);
                     // not sure about the break statement here
-                    break;
+
+                   // break;
                 }
 
 
             }
 
             for (BusRoute route : busStopRouteList) {
+                System.out.println("new unfiltered List: ");
                 for (Node stop : route.getBusStopList()) {
+
                     System.out.println("unfiltered Bus stop: " + stop.getStopId());
                 }
                 // stream filter the bus stop list from the initial list to get bus stop matches inside the square

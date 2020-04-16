@@ -142,11 +142,11 @@ public class RestAPIController {
         System.out.println("Bus stop list size: "+MinimisedStops.getBusStopList().size());
 
         RouteWeightCalculationManager routeWeightCalculationManager = new RouteWeightCalculationManager();
-        ArrayList<Edge> edgeList = routeWeightCalculationManager.calculateRouteWeights(MinimisedStops.getLuasStopList());
+        ArrayList<Edge> edgeList = routeWeightCalculationManager.calculateRouteWeights(MinimisedStops.getBusStopList());
 
         System.out.println("final edge list size: "+edgeList.size());
         DijkstraAlgorithmManager runNodeGraph = new DijkstraAlgorithmManager();
-        LinkedList<Node> finalPath = runNodeGraph.ExecuteAlgorithm(MinimisedStops.getLuasStopList(),edgeList);
+        LinkedList<Node> finalPath = runNodeGraph.ExecuteAlgorithm(MinimisedStops.getBusStopList(),edgeList);
 
 
         //add users start and finish location to the list
@@ -171,8 +171,8 @@ public class RestAPIController {
         HTTPRequest httpRequest = new HTTPRequest();
         GoogleDirectionsParser googleDirectionsParser= new GoogleDirectionsParser();
 
-        //long currentLegTime = (System.currentTimeMillis() / 1000);1583413500000
-        long currentLegTime = 1586088300;
+        //long currentLegTime = (System.currentTimeMillis() / 1000);//1583413500000
+        long currentLegTime = 1586098300;
         int index = 0;
         String busRoute = null;
 

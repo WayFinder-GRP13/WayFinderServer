@@ -76,8 +76,8 @@ public class NodeMinimisationManager {
 
 
         // add start and end node
-        BusStopList.add(BusStopsNodes.get(0));
         Collections.sort(LuasStopsNodes, Comparator.comparingDouble(Node::getDistanceToStartLocation));
+        BusStopList.add(BusStopsNodes.get(0));
         LuasStopList.add(LuasStopsNodes.get(0));
 
 
@@ -90,8 +90,8 @@ public class NodeMinimisationManager {
                 }
             }
 
-        BusStopList.add(BusStopsNodes.get(BusStopsNodes.size()-1));
         Collections.sort(LuasStopsNodes, Comparator.comparingDouble(Node::getDistanceToEndLocation));
+        BusStopList.add(BusStopsNodes.get(BusStopsNodes.size()-1));
         LuasStopList.add(LuasStopsNodes.get(0));
         return minimizedPaths;
     }
