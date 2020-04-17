@@ -4,7 +4,7 @@ public class CarCl {
 
     public double CarWeight(double distance) {
 
-        double CarW = CO2CalCar(distance) + SpeedOfCar(distance) + 10.00;
+        double CarW = CO2CalCar(distance) + SpeedOfCar(distance) + CostOfCar(distance);
         return CarW;
     }
 

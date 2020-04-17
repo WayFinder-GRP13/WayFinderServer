@@ -1,13 +1,23 @@
 package com.WayFinder.Server.Main.RouteWeightCalculation.Walk;
 
 import com.WayFinder.Server.Main.NodeCreation.Node;
+import com.WayFinder.Server.Main.PerferenceCalculation.PreferenceCalculationManager;
 
 public class WalkWeightCalculation {
 
-    public int getNodeWeight(Node firstNode, Node secondNode) {
+    public double getNodeWeight(Node firstNode, Node secondNode) {
+        final PreferenceCalculationManager prefer = new PreferenceCalculationManager();
         double distance = Distance(firstNode.getLatitude(),firstNode.getLongitudue(),secondNode.getLatitude(),secondNode.getLongitudue(),"K");
+        double Walkweight = prefer.getWalk(distance);
+        //double timeTaken = distance * 4.9;
+        //return (int)Math. ceil(timeTaken);
+        return(Walkweight);
+    }
+
+    public double Walkspeed(double distance)
+    {
         double timeTaken = distance * 4.9;
-        return (int)Math. ceil(timeTaken);
+        return timeTaken;
     }
 
 

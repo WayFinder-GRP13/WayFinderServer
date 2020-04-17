@@ -4,7 +4,7 @@ package com.WayFinder.Server.Main.RouteWeightCalculation.Bus;
 public class BusCal {
 
     public double BusWeight(double distance) {
-        double BusW = CO2CalBus(distance) + SpeedBus(distance) + 7.00;
+        double BusW = CO2CalBus(distance) + SpeedBus(distance) + costBus(); //7.00 is the cost
         return BusW;
     }
 
@@ -17,6 +17,10 @@ public class BusCal {
     public double SpeedBus(double distance) {
         double BusTime = distance / 60.00;
         return (BusTime);
+    }
+    public double costBus()
+    {
+        return 7.00;
     }
 
 }

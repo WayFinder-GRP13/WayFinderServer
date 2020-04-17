@@ -1,32 +1,19 @@
 package com.WayFinder.Server.Main.RouteWeightCalculation.Train;
 
 import com.WayFinder.Server.Main.NodeCreation.Node;
+import com.WayFinder.Server.Main.PerferenceCalculation.PreferenceCalculationManager;
 
 public class TrainWeightCalculation {
 
-//    public double TrainWeight(double distance) {
-//        double TrainW = CO2CalTrain(distance) + SpeedOfTrain(distance) + (10.00);
-//        return (TrainW);
-//    }
-//
-//    public double CO2CalTrain(double distance) {
-//
-//        double emmissions_per_TrainMile = distance * 0.41; // 0.41 --> dart an luas are different
-//
-//        return emmissions_per_TrainMile;
-//
-//    }
-//
-//    public double SpeedOfTrain(double distance) {
-//        double TrainTime = distance / 30.00;
-//        return (TrainTime);
-//    }
 
-
-    public int getNodeWeight(Node firstNode, Node secondNode) {
+    public double getNodeWeight(Node firstNode, Node secondNode) {
+        final PreferenceCalculationManager prefer = new PreferenceCalculationManager();
         double distance = Distance(firstNode.getLatitude(),firstNode.getLongitudue(),secondNode.getLatitude(),secondNode.getLongitudue(),"K");
-        double timeTaken = distance * 30;
-        return (int)Math. ceil(timeTaken);
+        double Trainweight = prefer.getTrain(distance);
+        //double timeTaken = distance * 30;
+        //return (int)Math. ceil(timeTaken);
+        return(Trainweight);
+
     }
 
     public double Distance(double lat1,double lon1,double lat2,double lon2, String unit) {

@@ -1,18 +1,18 @@
-package com.WayFinder.Server.Main.RouteWeightCalculation.Bus;
+package com.WayFinder.Server.Main.RouteWeightCalculation.Car;
 
 import com.WayFinder.Server.Main.NodeCreation.Node;
 import com.WayFinder.Server.Main.PerferenceCalculation.PreferenceCalculationManager;
-import com.WayFinder.Server.Main.PerferenceCalculation;
-public class BusWeightCalculation {
 
-    public double getNodeWeight(Node firstNode,Node secondNode){
+public class CarWeightCalculation {
+
+
+    public double getNodeWeight(Node firstNode, Node secondNode) {
         final PreferenceCalculationManager prefer = new PreferenceCalculationManager();
         double distance = Distance(firstNode.getLatitude(),firstNode.getLongitudue(),secondNode.getLatitude(),secondNode.getLongitudue(),"K");
-        double bestBusweight = prefer.getBus(distance);
-        
-        //double timeTaken = distance * 25;
+        double driveWeight = prefer.getDrive(distance);
+        //double timeTaken = distance * 30;
         //return (int)Math. ceil(timeTaken);
-        return(bestBusweight);
+        return(driveWeight);
 
     }
 
@@ -28,3 +28,9 @@ public class BusWeightCalculation {
         return dist;
     }
 }
+
+// Luas --> 30km/h
+// dart --> 30 km/h
+
+
+

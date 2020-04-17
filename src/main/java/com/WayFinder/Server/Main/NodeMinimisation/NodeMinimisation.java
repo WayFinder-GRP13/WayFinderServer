@@ -24,8 +24,7 @@ public class NodeMinimisation {
     ArrayList<String> MatchingRouteLuasStops = new ArrayList<>();
 
 
-
-    //     this method cycles through bus stops in order checking
+//   this method cycles through bus stops in order checking
 //    A-Z A-Y Y-B
 //     where A is closest node to start point and
 //     Z is closest node to end point
@@ -36,6 +35,7 @@ public class NodeMinimisation {
         //sort distance from shortest node to start point to furthest node to start point
         Collections.sort(initialStopList, Comparator.comparingDouble(Node::getDistanceToStartLocation));
 
+        // Can we not do both copies together, within the same for --> deep copies of initialStart& stop nodes
         // does a deep copy of the sorted array of start location distances
         for (Node node : initialStopList) {
             //Add the object clones
