@@ -6,10 +6,12 @@ import com.WayFinder.Server.Main.Enums.RequestType;
 import com.WayFinder.Server.Main.HTTPRequest.HTTPRequest;
 import com.WayFinder.Server.Main.Helpers.RequestHelper;
 import com.WayFinder.Server.Main.MainServer.MainClass;
+import com.WayFinder.Server.Main.Model.LocationPoint;
 import com.WayFinder.Server.Main.Model.RestAPIRequestInformation;
 import com.WayFinder.Server.Main.Models.*;
 
-import java.util.Comparator;
+import java.sql.*;
+import java.util.*;
 
 import com.WayFinder.Server.Main.NodeCreation.Node;
 import com.WayFinder.Server.Main.NodeCreation.NodeCreationManager;
@@ -22,10 +24,6 @@ import com.WayFinder.Server.Main.RouteWeightCalculation.RouteWeightCalculationMa
 import com.google.maps.model.LatLng;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 
@@ -34,6 +32,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 public class RestAPIController {
@@ -143,6 +143,7 @@ public class RestAPIController {
         GoogleDirectionsParser googleDirectionsParser= new GoogleDirectionsParser();
 
         long currentLegTime = System.currentTimeMillis() / 1000;
+        //long currentLegTime = 1587121773;
         int index = 0;
         String busRoute = null;
 
@@ -297,7 +298,9 @@ public class RestAPIController {
         // lines
         System.out.println("OPTIMAL LUAS ROUTE");
         if (nearestRedLineStartPointInfo.get(0).getDistance() < nearestGreenLineStartPointInfo.get(0).getDistance()) {
+            System.out.println("inside nearest distance redline");
             for (int i = redLineStartingIndex; i <= redLineEndingIndex; i++) {
+                System.out.println("inside nearest distance further redline");
                 LuasStop luasStop = new LuasStop();
                 luasStop.Latitude = redLineStopList.get(i).Latitude;
                 luasStop.Longitude = redLineStopList.get(i).Longitude;
@@ -305,7 +308,9 @@ public class RestAPIController {
                 finalLuasStops.add(luasStop);
             }
         } else {
-            for (int i = greenLineStartingIndex; i <= greenLineEndingIndex; i++) {
+            System.out.println("inside nearest distance greenline");
+            for (int i = greenLineStartingIndex; i >= greenLineEndingIndex; i--) {
+                System.out.println("inside nearest distance further greenline");
                 LuasStop luasStop = new LuasStop();
                 luasStop.Latitude = greenLineStopList.get(i).Latitude;
                 luasStop.Longitude = greenLineStopList.get(i).Longitude;
@@ -315,35 +320,63 @@ public class RestAPIController {
         }
         // The coordinates for luas stops along the optimal path
         System.out.println("Luas Coordinates: ");
+        System.out.println("Size of luas list: "+finalLuasStops.size());
         HTTPRequest httpRequest = new HTTPRequest();
         GoogleDirectionsParser googleDirectionsParser = new GoogleDirectionsParser();
 
         RouteJSONData routeJSONData = new RouteJSONData();
-        
+
+        // add start point and end point as walking
+        // start
+        finalLuasStops.add(0,new LuasStop("StartLocation",request.getStartLocation().lat,request.getStartLocation().lng,"start"));
+
+        // end point
+        finalLuasStops.add(new LuasStop("EndLocation",request.getEndLocation().lat,request.getEndLocation().lng,"end"));
+
+
 
         for (int i = 0; i < finalLuasStops.size()-1; i++) {
             System.out.println("Stop :- " + finalLuasStops.get(i).Pronunciation);
+
             Node origin = new Node();
             origin.setName(finalLuasStops.get(i).Pronunciation);
             origin.setLatitude(finalLuasStops.get(i).Latitude);
             origin.setLongitudue(finalLuasStops.get(i).Longitude);
 
             Node destination = new Node();
-            destination.setName(finalLuasStops.get(i+1).Pronunciation);
-            destination.setLatitude(finalLuasStops.get(i+1).Latitude);
-            destination.setLongitudue(finalLuasStops.get(i+1).Longitude);
+            destination.setName(finalLuasStops.get(i + 1).Pronunciation);
+            destination.setLatitude(finalLuasStops.get(i + 1).Latitude);
+            destination.setLongitudue(finalLuasStops.get(i + 1).Longitude);
 
-            String apiRequest = routeJSONData.getJSONpath(origin, destination, "transit");
-            String response = httpRequest.sendHTTPRequest(apiRequest);
-            // System.out.println(response);
-            String polyLine = googleDirectionsParser.ParseLuasStop(response);
+            String polyLine;
+            RouteResponse parsedResponse;
+            if (i == 0 || i == finalLuasStops.size() - 1) {
+                String apiRequest = routeJSONData.getJSONpath(origin, destination, "Walking");
+                System.out.println(apiRequest);
+                String response = httpRequest.sendHTTPRequest(apiRequest);
+                // System.out.println(response);
+                parsedResponse = googleDirectionsParser.ParseWalking(response);
+                polyLine = parsedResponse.getOverviewPolyline();
+            } else {
+                String apiRequest = routeJSONData.getJSONpath(origin, destination, "transit");
+                String response = httpRequest.sendHTTPRequest(apiRequest);
+                System.out.println(apiRequest);
+                // System.out.println(response);
+                parsedResponse = googleDirectionsParser.ParseLuasStopUpdated(response);
+                polyLine = parsedResponse.getOverviewPolyline();
+            }
 
             origin.setStopId("55");
             destination.setStopId("55");
-            FinalRoute finalRoutePoint = new FinalRoute(origin, destination, polyLine,2,5, "luas","now");
-            result.add(finalRoutePoint);
-        }
+            if(i==0 || i == finalLuasStops.size()-2){
+                FinalRoute finalRoutePoint = new FinalRoute(origin, destination, polyLine, 0, parsedResponse.getLength(), "WALKING", parsedResponse.getDepartureTime());
+                result.add(finalRoutePoint);
+            }else {
+                FinalRoute finalRoutePoint = new FinalRoute(origin, destination, polyLine, 2, parsedResponse.getLength(), parsedResponse.getRoute(), parsedResponse.getDepartureTime());
+                result.add(finalRoutePoint);
+            }
 
+        }
         // 1. find the nearest luas stops from start and end location
         // 2. store the index in the array of those locations
         // 3. get the stops between start and end locations
@@ -408,5 +441,106 @@ public class RestAPIController {
         }
         myRestAPIRequestInformation.remove(itemToRemove);
         return ResponseEntity.ok(myRestAPIRequestInformation);
+    }
+
+    @PostMapping(value = "/closeststopluas")
+    public ResponseEntity getClosestStop(@RequestBody LocationPoint request) {
+        System.out.println(request);
+        ArrayList<Node> LuasNodeList = new ArrayList<>();
+
+//        String LuasNodesQuery = "SELECT *\n" +
+//                "FROM luas\n" +
+//                "WHERE \n" +
+//                "  luas.geom && ST_MakeEnvelope(" + request.getSRTLocation().lat + "," + request.getSRTLocation().lng + "," + request.getENDLocation().lat + "," + request.getENDLocation().lng + ",4326);";
+
+        String LuasNodesQuery = "SELECT *\n" +
+                "FROM luas\n";// +
+//                "WHERE \n" +
+//                "  luas.geom && ST_MakeEnvelope(" + 53.406898 + "," + -6.370008 + "," + 53.262663 + "," + -6.005349 + ",4326);";
+
+        System.out.println("lat:"+request.getLat()+"Lng: "+request.getLng());
+        String LuasNodesDistanceQueryStartPoint = "SELECT  st_distance_sphere(st_point(" + request.getLat() + ", " + request.getLng() + "), st_point(luas.x, luas.y))\n" +
+                "FROM luas\n";
+
+        //database connection
+        String url = "jdbc:postgresql://ec2-46-137-177-160.eu-west-1.compute.amazonaws.com:5432/d9d9eb795ebrsl";
+        //ec2-46-137-177-160.eu-west-1.compute.amazonaws.com
+
+        //connection properties
+        Properties props = new Properties();
+        props.setProperty("user","bwtgzdutmqrmca");
+        props.setProperty("password","8b0a6af0e5d2a05bd6a462e8fb42320d0786a857ee56fd4aa4df9193583bd697");
+        props.setProperty("sslmode","require");
+
+        long startTime = System.currentTimeMillis();
+        try (Connection con = DriverManager.getConnection(url, props);
+             Statement st1 = con.createStatement();
+             ResultSet rs1 = st1.executeQuery(LuasNodesQuery)) {
+
+            ResultSetMetaData rsmd = rs1.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
+            while (rs1.next()) {
+                for (int i = 1; i <= columnsNumber; i++) {
+                    if (i > 1) System.out.print(",  ");
+                    String columnValue = rs1.getString(i);
+                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                }
+                int stopIDNumber = rs1.getInt(1);
+                Node LuasNode = new Node(rs1.getString(3), stopIDNumber, 2, rs1.getDouble(4), rs1.getDouble(5), 99);
+
+                LuasNodeList.add(LuasNode);
+                System.out.println("");
+            }
+            long endTime = System.currentTimeMillis();
+
+            System.out.println("That took " + (endTime - startTime) + " milliseconds");
+
+
+        } catch (SQLException ex) {
+
+            Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
+            lgr.log(Level.SEVERE, ex.getMessage(), ex);
+        }
+
+        int counter=0;
+        try (Connection con2 = DriverManager.getConnection(url, props);
+             Statement st2 = con2.createStatement();
+             ResultSet rs2 = st2.executeQuery(LuasNodesDistanceQueryStartPoint)) {
+
+            ResultSetMetaData rsmd = rs2.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
+            while (rs2.next()) {
+                for (int i = 1; i <= columnsNumber; i++) {
+                    String columnValue = rs2.getString(i);
+                    System.out.println("VALUE: "+columnValue);
+                }
+                if(counter<=LuasNodeList.size()-1) {
+                    Node currentStop = LuasNodeList.get(counter);
+                    System.out.println(currentStop.getStopId());
+                    System.out.println(currentStop.getName());
+
+                    currentStop.setDistanceToStartLocation(rs2.getDouble(1));
+                    System.out.println(currentStop.getDistanceToStartLocation());
+                }
+                counter = counter + 1;
+            }
+
+        } catch (SQLException ex) {
+
+            Logger lgr = Logger.getLogger(NodeCreationManager.class.getName());
+            lgr.log(Level.SEVERE, ex.getMessage(), ex);
+        }
+
+
+        //sort distance from shortest node to start point to furthest node to start point
+        System.out.println(LuasNodeList.get(0).getDistanceToStartLocation());
+        Collections.sort(LuasNodeList, Comparator.comparingDouble(Node::getDistanceToStartLocation));
+        System.out.println(LuasNodeList.get(0).getDistanceToStartLocation());
+
+
+        //LuasNodeList.size()-1
+        LocationPoint closestPoint = new LocationPoint(LuasNodeList.get(0).getLatitude(),LuasNodeList.get(0).getLongitudue());
+
+        return ResponseEntity.ok(closestPoint);
     }
 }

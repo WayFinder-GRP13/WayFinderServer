@@ -19,7 +19,7 @@ public class NodeMinimisationManager {
             System.out.println("Route is: "+route);
         }
         // from the matched index check the next x stops for further matches in routes
-        //nodeMinimisation.furtherBusRouteMatches(initialList);
+        nodeMinimisation.furtherBusRouteMatches(initialList);
         // returns the minimised list
         return nodeMinimisation.minimiseNodeList(initialList,startLocation, EndLocation);
     }

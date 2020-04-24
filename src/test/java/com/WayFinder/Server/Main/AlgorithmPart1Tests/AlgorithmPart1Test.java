@@ -20,10 +20,10 @@ public class AlgorithmPart1Test {
         String stopID = busStop.getStopId();
         double latitude = busStop.getLatitude();
         double longitude =busStop.getLongitudue();
-        assertEquals("Merchants Road",stopName.toString());
-        assertEquals("2262",stopID);
+        assertEquals("Church Court",stopName.toString());
+        assertEquals("2261",stopID);
         assertEquals(latitude,53.353522900000002,.001);
-        assertEquals(longitude,-6.226595602000000,.001);
+        assertEquals(longitude,-6.232415894,.001);
 
     }
 

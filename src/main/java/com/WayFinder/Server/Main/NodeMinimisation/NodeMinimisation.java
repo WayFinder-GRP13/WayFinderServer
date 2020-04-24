@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class NodeMinimisation {
     BusAPIController busAPIController = new BusAPIController();
     // this values gets the closest nodes to start and end points
-    private int CloseNodeCheckAmount = 1;
+    private int CloseNodeCheckAmount = 3;
     private int MatchedIndex;
     ArrayList<Node> SortedDistanceStartNodes = new ArrayList<>();
     ArrayList<Node> SortedDistanceEndNodes = new ArrayList<>();
@@ -204,8 +204,8 @@ public class NodeMinimisation {
         //for (String matchedRoute : MatchingRouteStops) {
             try {
                 // call the bus api to get all bus stops for the route
-                System.out.println("Chosen Route was: "+MatchingRouteStops.get(4));
-                BusRouteList routeList = busAPIController.getRouteInformation(MatchingRouteStops.get(4));
+                System.out.println("Chosen Route was: "+MatchingRouteStops.get(0));
+                BusRouteList routeList = busAPIController.getRouteInformation(MatchingRouteStops.get(0));
                 ArrayList<BusRoute> busStopRouteList = new ArrayList<>();
                 for (BusRoute route : routeList.getBusRouteList()) {
                     Node StartStopRoute = route.getBusStopList().get(0);
