@@ -1,12 +1,13 @@
 package com.WayFinder.Server.Main.RouteWeightCalculation.Walk;
 
+import com.WayFinder.Server.Main.Model.RestAPIRequestInformation;
 import com.WayFinder.Server.Main.NodeCreation.Node;
 
 public class WalkWeightCalculation {
 
-    public int getNodeWeight(Node firstNode, Node secondNode) {
+    public int getNodeWeight(Node firstNode, Node secondNode, RestAPIRequestInformation request) {
         double distance = Distance(firstNode.getLatitude(),firstNode.getLongitudue(),secondNode.getLatitude(),secondNode.getLongitudue(),"K");
-        double timeTaken = distance * 4.9;
+        double timeTaken = distance * 4.9 * request.getSettings().getScaleSettings().getSpeedScale();
         return (int)Math. ceil(timeTaken);
     }
 

@@ -1,6 +1,7 @@
 package com.WayFinder.Server.Main.RouteWeightCalculation;
 
 import com.WayFinder.Server.Main.DijkstraAlgorithm.Edge;
+import com.WayFinder.Server.Main.Model.RestAPIRequestInformation;
 import com.WayFinder.Server.Main.NodeCreation.Node;
 import com.WayFinder.Server.Main.RouteWeightCalculation.Bus.BusWeightCalculation;
 import com.WayFinder.Server.Main.RouteWeightCalculation.Train.TrainWeightCalculation;
@@ -14,7 +15,7 @@ public class RouteWeightCalculationManager {
     private TrainWeightCalculation trainWeightCalculation = new TrainWeightCalculation();
 
 
-    public ArrayList<Edge> calculateRouteWeights(ArrayList<Node> NodeList){
+    public ArrayList<Edge> calculateRouteWeights(ArrayList<Node> NodeList, RestAPIRequestInformation request){
         ArrayList<Edge> edgeList = new ArrayList<>();
         //cycles through the list to size minus one
         //selects two nodes and calculates the weight between them for each transport type
@@ -31,21 +32,21 @@ public class RouteWeightCalculationManager {
                 //walk to walk
                 if(secondNode.getTransportType()==0){
                     //call walk
-                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode);
+                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode,request);
                     edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,walkWeight,0));
 
                 }
                 //walk to bus
                 if(secondNode.getTransportType()==1){
                     //call walk
-                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode);
+                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode,request);
                     edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,walkWeight,0));
 
                 }
                 //car to cycle
                 if(secondNode.getTransportType()==2){
                     //call walk
-                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode);
+                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode,request);
                     edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,walkWeight,0));
                 }
 
@@ -56,7 +57,7 @@ public class RouteWeightCalculationManager {
                 //bus to walk
                 if(secondNode.getTransportType()==0){
                     //call walk
-                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode);
+                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode,request);
                     edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,walkWeight,0));
 
                 }
@@ -64,8 +65,8 @@ public class RouteWeightCalculationManager {
                 if(secondNode.getTransportType()==1){
                     // walk
                     // bus
-                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode);
-                    int busWeight = busWeightCalculation.getNodeWeight(firstNode,secondNode);
+                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode,request);
+                    int busWeight = busWeightCalculation.getNodeWeight(firstNode,secondNode,request);
                     System.out.println("Weight for walking is: "+walkWeight);
                     System.out.println("Weight for bus is: "+busWeight);
                     //if bus weight largest use bus weight for edge
@@ -85,14 +86,14 @@ public class RouteWeightCalculationManager {
                 //bus to cycle
                 if(secondNode.getTransportType()==2){
                     // walk
-                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode);
+                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode,request);
                     edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,walkWeight,0));
 
                 }
                 //bus to Train
                 if(secondNode.getTransportType()==3){
                     // walk
-                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode);
+                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode,request);
                     edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,walkWeight,0));
 
                 }
@@ -104,14 +105,14 @@ public class RouteWeightCalculationManager {
                 //train to walk
                 if(secondNode.getTransportType()==0){
                     //walk
-                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode);
+                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode,request);
                     edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,walkWeight,0));
 
                 }
                 //train to bus
                 if(secondNode.getTransportType()==1){
                     //call walk
-                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode);
+                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode,request);
                     edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,walkWeight,0));
 
 
@@ -119,7 +120,7 @@ public class RouteWeightCalculationManager {
                 //train to cycle
                 if(secondNode.getTransportType()==2){
                     //call walk
-                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode);
+                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode,request);
                     edgeList.add(new Edge(Integer.toString(i),firstNode,secondNode,walkWeight,0));
 
                 }
@@ -128,7 +129,7 @@ public class RouteWeightCalculationManager {
                 if(secondNode.getTransportType()==3){
                     //walk
                     // train
-                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode);
+                    int walkWeight = walkWeightCalculation.getNodeWeight(firstNode,secondNode,request);
                     int TrainWeight = trainWeightCalculation.getNodeWeight(firstNode,secondNode);
                     //if bus weight largest use bus weight for edge
                     if(TrainWeight>walkWeight){

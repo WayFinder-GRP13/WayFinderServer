@@ -25,7 +25,7 @@ class RouteWeightCalculationManagerTest {
         final ArrayList<Node> NodeList = new ArrayList<>(Arrays.asList(new Node("Name", 0, 2, 50.0, 50.0, 0.0),new Node("Name", 1, 2, 50.0, 40.0, 0.0),new Node("Name", 2, 0, 40.0, 40.0, 0.0)));
 
         // Run the test
-        final ArrayList<Edge> result = routeWeightCalculationManagerUnderTest.calculateRouteWeights(NodeList);
+        final ArrayList<Edge> result = routeWeightCalculationManagerUnderTest.calculateRouteWeights(NodeList, request);
 
         assertEquals(3500,result.get(0).getWeight());
         assertEquals(5449,result.get(1).getWeight());

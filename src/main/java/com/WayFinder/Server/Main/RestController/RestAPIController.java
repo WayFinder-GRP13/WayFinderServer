@@ -113,7 +113,7 @@ public class RestAPIController {
         System.out.println("Bus stop list size: "+BusStopsNodes.size());
 
         RouteWeightCalculationManager routeWeightCalculationManager= new RouteWeightCalculationManager();
-        ArrayList<Edge> edgeList = routeWeightCalculationManager.calculateRouteWeights(BusStopsNodes);
+        ArrayList<Edge> edgeList = routeWeightCalculationManager.calculateRouteWeights(BusStopsNodes,request);
 
         System.out.println("final edge list size: "+edgeList.size());
         DijkstraAlgorithmManager runNodeGraph = new DijkstraAlgorithmManager();
