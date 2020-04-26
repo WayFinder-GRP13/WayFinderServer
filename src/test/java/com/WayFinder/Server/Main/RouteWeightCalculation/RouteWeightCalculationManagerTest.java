@@ -1,7 +1,9 @@
 package com.WayFinder.Server.Main.RouteWeightCalculation;
 
 import com.WayFinder.Server.Main.DijkstraAlgorithm.Edge;
+import com.WayFinder.Server.Main.Model.RestAPIRequestInformation;
 import com.WayFinder.Server.Main.NodeCreation.Node;
+import com.WayFinder.Server.Main.UserSettings.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +26,7 @@ class RouteWeightCalculationManagerTest {
         // Setup
         final ArrayList<Node> NodeList = new ArrayList<>(Arrays.asList(new Node("Name", 0, 2, 50.0, 50.0, 0.0),new Node("Name", 1, 2, 50.0, 40.0, 0.0),new Node("Name", 2, 0, 40.0, 40.0, 0.0)));
 
+        RestAPIRequestInformation request = new RestAPIRequestInformation(1,"test","55","50","60","40",new UserSettings(1,new BusSettings(true,0),new RailSettings(true,0),new CarSettings(true,0),new WalkSettings(true,0),new CycleSettings(true,0),new ScaleSettings(5,5,5)));
         // Run the test
         final ArrayList<Edge> result = routeWeightCalculationManagerUnderTest.calculateRouteWeights(NodeList, request);
 

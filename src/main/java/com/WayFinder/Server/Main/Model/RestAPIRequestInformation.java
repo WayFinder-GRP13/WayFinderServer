@@ -10,7 +10,7 @@ public class RestAPIRequestInformation {
     private LatLng endLocation;
     private UserSettings settings;
 
-    RestAPIRequestInformation(int id, String name, String startLocationLat,String startLocationLong,String endLocationLat,String endLocationLong,UserSettings settings){
+    public RestAPIRequestInformation(int id, String name, String startLocationLat, String startLocationLong, String endLocationLat, String endLocationLong, UserSettings settings){
         this.id = id;
         this.name = name;
         double startLocationLatD = Double.parseDouble(startLocationLat);
